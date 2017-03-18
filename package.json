@@ -1,0 +1,36 @@
+{
+  "name": "autocell",
+  "version": "0.0.1",
+  "description": "Exploration of cellular automata",
+  "main": "bundle.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+
+  "dependencies": {
+    "babel-core": "^6.18.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.7",
+    "babel-preset-es2015": "^6.18.0",
+    "webpack": "^1.13.3"
+  },
+
+
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alanmacleod/autocell.git"
+  },
+  "keywords": [
+    "cellular",
+    "automata"
+  ],
+  "author": "Alan MacLeod",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alanmacleod/autocell/issues"
+  },
+  "homepage": "https://github.com/alanmacleod/autocell#readme"
+}
