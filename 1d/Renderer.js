@@ -9,7 +9,7 @@ export default class Renderer1d
     this.size = size;
   }
 
-
+  // Draw a row of blocks 
   render(generation, iteration)
   {
     let y = iteration * this.size;

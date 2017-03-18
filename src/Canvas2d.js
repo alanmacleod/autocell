@@ -1,5 +1,7 @@
 
 
+// Boilerplate functions to write to the Canvas 
+
 export default class Canvas2d
 {
   constructor(parent)
@@ -50,7 +52,7 @@ export default class Canvas2d
 
     this.element.width = w;
     this.element.height = h;
-    
+
     // draw()
   }
 }
