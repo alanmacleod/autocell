@@ -31,6 +31,8 @@ function Init()
 
   worldSize = Math.floor(c.width() / s);
   iterations = Math.floor(c.height() / s);
+
+  c.clear();
 }
 
 function Evolve()
@@ -41,12 +43,19 @@ function Evolve()
   let g = new Generation(worldSize);
 
   renderer.render(g, 0);
+  let iteration = 1;
 
-  for (let i=1; i<iterations; i++)
-  {
+  window.setInterval(() => {
     g = g.mutate(rule);
-    renderer.render(g, i);
-  }
+    renderer.render(g, iteration);
+    iteration++;
+  }, 10);
+
+  // for (let i=1; i<iterations+1000; i++)
+  // {
+  //   g = g.mutate(rule);
+  //   renderer.render(g, i);
+  // }
 
 }
 
