@@ -19,24 +19,21 @@ export default class Renderer1d
 
     let y = iteration * this.size;
 
+    // Iteration exceeds screen space...
     if (iteration > maxrow)
     {
+      // Copy the whole screen and shift it up one block size
+      let x1 = 0, y1 = this.size;
+      let w = vwidth, h = vheight - this.size;
+      this.canvas2d.selfblit(x1, y1, w, h, 0, 0, w, h);
 
-      let x1 = 0, y1 = 1 * this.size;
-      let xw = vwidth, yh = vheight - this.size;      
-      this.canvas2d.context.drawImage(this.canvas2d.context.canvas, x1, y1, xw, yh, 0, 0, xw, yh);
-
+      // adjust iteration to the bottom most row
       iteration = maxrow;
       y = iteration * this.size;
+
+      // Clear the last row ready for drawing
       this.canvas2d.block(0, y, vwidth, this.size, [255,255,255]);
-
-    //  return;
     }
-
-    //if (iteration > maxrow) return;
-
-
-
 
     for (let w=0; w<generation.data.length-1; w++)
     {

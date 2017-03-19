@@ -1,6 +1,6 @@
 
 
-// Boilerplate functions to write to the Canvas 
+// Boilerplate functions to write to the Canvas
 
 export default class Canvas2d
 {
@@ -21,6 +21,11 @@ export default class Canvas2d
     t.rect(x, y, w, h);
     t.fillStyle = c ? `rgb(${c[0]},${c[1]},${c[2]})` : "black";
     t.fill();
+  }
+
+  selfblit(sx, sy, sw, sh, dx, dy, dw, dh)
+  {
+    this.context.drawImage(this.context.canvas, sx, sy, sw, sh, dx, dy, dw, dh);
   }
 
   clear(c)

@@ -6,15 +6,19 @@ import Generation   from './Generation';
 import Rule         from './Rule';
 import Renderer1d   from './Renderer';
 
-let renderer, iterations, worldSize, rule;
+let renderer, worldSize, rule, timer = null;
 
 let c = new Canvas2d("content");
 c.fitwindow();
 
+Restart();
 
-Init();
-Evolve();
 
+function Restart()
+{
+  Init();
+  Evolve();
+}
 
 function Init()
 {
@@ -24,52 +28,51 @@ function Init()
   let s = Math.max(Math.min(ts.value, 32),1);
   let r = Math.max(Math.min(tr.value, 255),1);
 
+  s = isNaN(s) ? 4 : s;
+  r = isNaN(r) ? 90: r;
+
   [ts.value, tr.value] = [s, r];
 
   renderer = new Renderer1d(c, s);
   rule = new Rule(r);
 
   worldSize = Math.floor(c.width() / s);
-  iterations = Math.floor(c.height() / s);
+
+  if (timer) window.clearInterval(timer);
 
   c.clear();
 }
+
 
 function Evolve()
 {
   c.fitwindow();
   c.clear();
 
+  // Create the first generation
   let g = new Generation(worldSize);
 
-  renderer.render(g, 0);
-  let iteration = 1;
+  let iteration = 0;
+  // Render first gen now
+  renderer.render(g, iteration++);
 
-  window.setInterval(() => {
+  // For 2d+ version use requestAnimationFrame()
+  timer = window.setInterval(() => {
+
+    // Mutate the last generation into a new one
     g = g.mutate(rule);
-    renderer.render(g, iteration);
-    iteration++;
-  }, 10);
+    renderer.render(g, iteration++);
 
-  // for (let i=1; i<iterations+1000; i++)
-  // {
-  //   g = g.mutate(rule);
-  //   renderer.render(g, i);
-  // }
+  }, 25);
 
 }
 
 
 document.getElementById("btnRun").onclick = () => {
-  Init();
-  Evolve();
+  Restart();
 }
 
 
 window.onresize = (e) => {
-  Init();
-  Evolve();
+  Restart();
 }
-
-
-// hello
