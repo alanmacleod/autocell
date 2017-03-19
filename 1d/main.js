@@ -4,7 +4,7 @@
 import Canvas2d     from '../shared/Canvas2d';
 import Generation   from './Generation';
 import Rule         from './Rule';
-import Renderer1d   from './Renderer';
+import Renderer1d   from './Renderer1d';
 
 let renderer, worldSize, rule, timer = null;
 

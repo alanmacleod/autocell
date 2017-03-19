@@ -58,8 +58,7 @@ export default class World
 
   array2d(size)
   {
-    let d;
-    for (d=[]; d.length < size; d.push([]));
+    for (var d=[]; d.length < size; d.push([]));
     return d;
   }
 
@@ -70,7 +69,7 @@ export default class World
     for (let y=0; y<this.size; y++)
     {
       for (let x=0; x<this.size; x++)
-        this.next[y][x] = rule.apply(this.neighbourhood(x,y));
+        next[y][x] = rule.apply(this.neighbourhood(x,y));
     }
 
     this.data = next;
