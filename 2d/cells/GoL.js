@@ -21,15 +21,23 @@ export default class GameOfLife extends Cell
     return palette[ this.alive ];
   }
 
-  // Assigns a generic 'value' to feedback into the Cell 'interface' counting method
+
   evaluate()
   {
     return this.alive ? 1 : 0;
   }
 
+  // // Gets or assigns a 'value' to feedback into the Cell 'interface' counting method
+  value(v)
+  {
+    if (v === undefined) return this.alive ? 1 : 0;
+    this.alive = (v == 0) ? DEAD : ALIVE;
+  }
+
+
   mutate(cells)
   {
-    let n = this.numNeighbours(cells);
+    let n = this.numLiveNeighbours(cells);
     let me = new GameOfLife();
     let newState = DEAD;
 
@@ -40,9 +48,10 @@ export default class GameOfLife extends Cell
     else if (!cells.subject.alive && n == 3)
       newState = ALIVE;
     else
-      newState = cells.subject.alive;
+      newState = cells.subject.value();
 
-    me.alive = newState;
+    me.value(newState);
+
     return me;
   }
 

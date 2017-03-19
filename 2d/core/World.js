@@ -32,6 +32,7 @@ export default class World
     let vy = y - radius;
 
     let n = this.array2d(num);
+    let l = [];
 
     for (let iy=0; iy<num; iy++)
     {
@@ -39,6 +40,7 @@ export default class World
       for (let ix=0; ix<num; ix++)
       {
         n[iy][ix] = this.data[this.wrap(vy)][this.wrap(vx)];
+        l.push(this.data[this.wrap(vy)][this.wrap(vx)]);
         vx++;
       }
       vy++;
@@ -46,6 +48,7 @@ export default class World
 
     return {
       cells: n,
+      linear: l,
       radius: radius,
       subject: this.data[y][x]
     }
@@ -64,7 +67,7 @@ export default class World
     return d;
   }
 
-  mutate()
+  evolve()
   {
     let next = this.array2d(this.size);
 
