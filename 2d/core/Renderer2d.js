@@ -1,5 +1,5 @@
 
-import Canvas2d from '../shared/Canvas2d';
+import Canvas2d from '../../shared/Canvas2d';
 
 export default class Renderer2d
 {
@@ -29,8 +29,12 @@ export default class Renderer2d
     {
       for (let x=0; x<this.size; x++)
       {
-        let col = data[y][x] ? [0,0,0] : [255,255,255];
-        this.canvas2d.block(y * this.scale, x * this.scale, this.scale, this.scale, col);
+        if (data[y][x])
+        {
+          let col = data[y][x].shader();
+        //let col = data[y][x] ? [0,0,0] : [255,255,255];
+          this.canvas2d.block(y * this.scale, x * this.scale, this.scale, this.scale, col);
+        }
       }
     }
 

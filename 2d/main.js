@@ -1,22 +1,32 @@
 
 
-import World        from './World.js';
-import Renderer     from './Renderer2d';
-import GameOfLife   from './Rule-GoL';
+import World        from './core/World.js';
+import Renderer     from './core/Renderer2d';
+import GameOfLife   from './cells/Cell-GoL';
 
 const SIZE = 100; // cells
 const VIEW_SCALE = 8;
 
 let lastTime = 0, frames = 0, avFrames = 0;
-let world = new World(SIZE);
-let rule = new GameOfLife();
-let fpsText = document.getElementById("fps");
+
+let world = new World({
+  size: SIZE,
+  spread: 1.0,
+  type: GameOfLife
+});
 
 let renderer = new Renderer("content");
 renderer.scale = VIEW_SCALE;
 
-window.requestAnimationFrame(render);
 
+world.mutate();
+
+renderer.render(world.data);
+
+
+let fpsText = document.getElementById("fps");
+
+window.requestAnimationFrame(render);
 
 function render()
 {
@@ -31,12 +41,8 @@ function render()
     fpsText.innerHTML = (avFrames / 10).toFixed(1) + " FPS";
     frames = 0;
     avFrames = 0;
-    world.mutate(rule);
+    world.mutate();
   }
-
-
-
-
 
   renderer.render(world.data);
   window.requestAnimationFrame(render);

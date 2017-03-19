@@ -2,23 +2,25 @@
 
 export default class World
 {
-  constructor(size)
+  constructor(options)
   {
-    this.size = size; //cells, square
+
+    this.size = options.size; //cells, square
     this.data = null;
 
-    this.init();
+    this.init(options.type, options.spread);
   }
 
-  init()
+  init(CellType, spread)
   {
     // Create the array:
     this.data = this.array2d(this.size);
     let i = 0;
-    // Randomise the initial state:
+
     for (let y=0; y<this.size; y++)
       for (let x=0; x<this.size; x++)
-        this.data[y][x] = Math.round(Math.random());
+        if (Math.random() <= spread)
+          this.data[y][x] = new CellType();
   }
 
   neighbourhood(x, y, r)
@@ -62,14 +64,18 @@ export default class World
     return d;
   }
 
-  mutate(rule)
+  mutate()
   {
     let next = this.array2d(this.size);
 
     for (let y=0; y<this.size; y++)
     {
       for (let x=0; x<this.size; x++)
-        next[y][x] = rule.apply(this.neighbourhood(x,y));
+      {
+        if (this.data[y][x])
+          next[y][x] = this.data[y][x].mutate(this.neighbourhood(x,y));
+
+      }
     }
 
     this.data = next;
