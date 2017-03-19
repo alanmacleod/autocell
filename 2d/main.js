@@ -4,6 +4,8 @@ import World        from './core/World.js';
 import Renderer     from './core/Renderer2d';
 import GameOfLife   from './cells/GoL';
 import Flood        from './cells/Flood';
+import Burrow       from './cells/Burrow';
+import Blur         from './cells/Blur';
 
 const SIZE = 75; // cells
 const VIEW_SCALE = 8;
@@ -16,7 +18,7 @@ let lastTime = 0, frames = 0, avFrames = 0;
 let world = new World({
   size: SIZE,
   spread: 1.0,
-  type: Flood
+  type: Blur
 });
 
 let renderer = new Renderer("content");
@@ -25,7 +27,7 @@ renderer.scale = VIEW_SCALE;
 renderer.render(world.data);
 world.evolve();
 
-
+window.world = world;
 
 window.requestAnimationFrame(render);
 window.setInterval(() => { world.evolve() }, 1000 / WORLD_FRAME_RATE);

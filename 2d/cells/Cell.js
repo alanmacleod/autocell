@@ -9,6 +9,11 @@ export default class Cell
 
   }
 
+  prepare()
+  {
+
+  }
+
   mutate(neighbours)
   {
 
@@ -35,5 +40,33 @@ export default class Cell
 
     // don't include 'us' in the count!
     return num - (n.subject.value() > 0 ? 1 : 0);
+  }
+
+  numNeighboursWithValue(n, v)
+  {
+    let num = 0;
+
+    for (let t=0; t<n.linear.length; t++)
+    {
+      if (n.linear[t])
+        if (n.linear[t].value() == v) num++;
+    }
+    return num;
+  }
+
+  averageValueNeighbours(n)
+  {
+    let sum = 0;
+    for (let t=0; t<n.linear.length; t++)
+    {
+      if (n.linear[t])
+      {
+        sum += n.linear[t].value();
+      }
+    }
+
+    sum -= n.subject.value();
+
+    return sum / (n.linear.length-1);
   }
 }

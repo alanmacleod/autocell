@@ -71,17 +71,26 @@ export default class World
   {
     let next = this.array2d(this.size);
 
+    this.prepare();
+
     for (let y=0; y<this.size; y++)
     {
       for (let x=0; x<this.size; x++)
       {
         if (this.data[y][x])
           next[y][x] = this.data[y][x].mutate(this.neighbourhood(x,y));
-
       }
     }
 
     this.data = next;
+  }
+
+
+  prepare()
+  {
+    for (let y=0; y<this.size; y++)
+      for (let x=0; x<this.size; x++)
+        if (this.data[y][x]) this.data[y][x].prepare();
   }
 
 }
