@@ -33,7 +33,7 @@ export default class Renderer2d
         {
           let col = data[y][x].shader();
         //let col = data[y][x] ? [0,0,0] : [255,255,255];
-          this.canvas2d.block(y * this.scale, x * this.scale, this.scale, this.scale, col);
+          this.canvas2d.block(x * this.scale, y * this.scale, this.scale, this.scale, col);
         }
       }
     }

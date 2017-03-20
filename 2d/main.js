@@ -6,10 +6,11 @@ import GameOfLife   from './cells/GoL';
 import Flood        from './cells/Flood';
 import Burrow       from './cells/Burrow';
 import Blur         from './cells/Blur';
+import Snow         from './cells/Snow';
 
 const SIZE = 75; // cells
 const VIEW_SCALE = 8;
-const WORLD_FRAME_RATE = 30;
+const WORLD_FRAME_RATE = 15;
 
 let fpsText = document.getElementById("fps");
 
@@ -18,14 +19,17 @@ let lastTime = 0, frames = 0, avFrames = 0;
 let world = new World({
   size: SIZE,
   spread: 1.0,
-  type: Blur
+  type: Flood
 });
 
 let renderer = new Renderer("content");
 renderer.scale = VIEW_SCALE;
 
-renderer.render(world.data);
-world.evolve();
+// world.evolve();
+// renderer.render(world.data);
+//
+// console.log(world.data);
+
 
 window.world = world;
 

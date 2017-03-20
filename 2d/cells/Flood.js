@@ -71,13 +71,22 @@ export default class Flood extends Cell
   mutate(entity)
   {
 
-    let next = (this.value() + (Math.floor(Math.random() * 5))) % MAX_VALUES;
+    let next = (this.value() + 1 + (Math.floor(Math.random() * 3))) % MAX_VALUES;
+    //(this.value() + (Math.floor(Math.random() * 5))) % MAX_VALUES;
 
     let change = false;
     for (let t=0; t<entity.linear.length; t++)
     {
       if (entity.linear[t])
         change = change || entity.linear[t].value() === next;
+    }
+
+    if (!change)
+    {
+      let nc = this.averageValueNeighbours(entity);
+      if (Math.abs(this.value() - nc) == 1)
+        this.value(nc);
+
     }
 
     if (change)

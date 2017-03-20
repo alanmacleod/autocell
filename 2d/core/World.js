@@ -18,9 +18,26 @@ export default class World
     let i = 0;
 
     for (let y=0; y<this.size; y++)
+    {
       for (let x=0; x<this.size; x++)
-        if (Math.random() <= spread)
-          this.data[y][x] = new CellType();
+      {
+        // Does CellType provide a static 'test'ing function?
+        if (CellType.test)
+        {
+          // Is it ok if we place the cell here?
+          //if ()
+          if (Math.random() <= spread)
+            this.data[y][x] = new CellType(
+              CellType.test(x,y,this.size, this.size)
+            );
+        } else {
+          if (Math.random() <= spread)
+            this.data[y][x] = new CellType();
+        }
+      }
+    }
+
+
   }
 
   neighbourhood(x, y, r)
@@ -88,9 +105,11 @@ export default class World
 
   prepare()
   {
+    let n = 0;
     for (let y=0; y<this.size; y++)
       for (let x=0; x<this.size; x++)
         if (this.data[y][x]) this.data[y][x].prepare();
+
   }
 
 }
