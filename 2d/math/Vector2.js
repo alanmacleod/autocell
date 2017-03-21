@@ -8,6 +8,12 @@ export default class Vector2
     this.y = 0 || y;
   }
 
+  set(x, y)
+  {
+    [this.x, this.y] = [x, y];
+    return this;
+  }
+
   sub(b)
   {
     return new Vector2(b.x - this.x, b.y - this.y);

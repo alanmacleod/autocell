@@ -17,6 +17,14 @@ export default class OpenWorld
     this.renderer = PIXI.autoDetectRenderer(this.size * this.scale, this.size * this.scale);
     this.stage = new PIXI.Container();
     this.element.appendChild(this.renderer.view);
+    this.mouse = new Vector2(0,0);
+
+    //this.interaction = new PIXI.interaction.InteractionManager(this.renderer);
+    this.element.onmousemove = (e) => { this.mouse.set(e.clientX, e.clientY);}
+
+
+    //this.interaction
+
     // this.ptype = {};
     //
     // this.ptype['vertical'] = this.vertical;
@@ -36,7 +44,7 @@ export default class OpenWorld
     this.data = [];
     this.graphics = [];
 
-    let done = 0, max = 10;
+    let done = 0, max = 100;
 
     for (let y=0; y<this.size; y++)
     {
@@ -44,8 +52,9 @@ export default class OpenWorld
       {
         if (Math.random() < spread)
         {
+          let c = new CellType(new Vector2(x, y), new Vector2(this.size, this.size))
           this.data.push(
-            new CellType(new Vector2(x, y), new Vector2(this.size, this.size))
+            c
           );
 
           var r = new PIXI.Graphics();
@@ -53,8 +62,8 @@ export default class OpenWorld
           r.beginFill(0xffffff);
           r.drawRect(0,0,this.scale, this.scale);
           r.endFill();
-          r.x = x * this.scale;
-          r.y = y * this.scale;
+          r.x = c.position.x * this.scale;
+          r.y = c.position.y * this.scale;
           this.graphics.push(r);
           this.stage.addChild(r);
 
@@ -99,10 +108,11 @@ export default class OpenWorld
 
     let statistics = {
       centroid: this.centroid(),
-      number: this.data.length
+      number: this.data.length,
+      mouse: this.mouse.div(this.scale)
     }
 
-    let radius = 15;
+    let radius = 10;
 
     for (let t=0,l=this.data.length; t<l;t++)
     {
@@ -145,7 +155,7 @@ export default class OpenWorld
       sy += this.data[t].position.y;
     }
 
-    return new Vector2(sx / this.data.length, sy, this.data.length);
+    return new Vector2(sx / this.data.length, sy / this.data.length);
   }
 
 
