@@ -28,7 +28,7 @@ module.exports = [
         }
     },
     {
-        entry: './2d/main.js',
+        entry: './2d/main2.js',
         devtool: "inline-sourcemap",
         output: {
           path: path.join(__dirname, "/2d/build"),

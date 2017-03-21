@@ -1,5 +1,8 @@
 
 //import Renderer     from './Renderer2d';
+import Vector2  from '../math/Vector2.js';
+let PIXI = require('pixi.js');    // ffs update your module defs, PIXI
+
 
 export default class OpenWorld
 {
@@ -7,6 +10,13 @@ export default class OpenWorld
   {
     this.size = options.size; // World size
     this.data = null;
+    this.scale = options.scale || 1;
+
+    this.element = document.getElementById(options.render);
+
+    this.renderer = PIXI.autoDetectRenderer(this.size * this.scale, this.size * this.scale);
+    this.stage = new PIXI.Container();
+    this.element.appendChild(this.renderer.view);
     // this.ptype = {};
     //
     // this.ptype['vertical'] = this.vertical;
@@ -20,56 +30,55 @@ export default class OpenWorld
     this.init(options.type, options.spread);
   }
 
+  // Create and save a list of entities
   init(CellType, spread)
   {
     this.data = [];
-    for (let t=0; t<this.size*this.size; t++)
+    this.graphics = [];
+
+    let done = 0, max = 10;
+
+    for (let y=0; y<this.size; y++)
     {
-      if (Math.random() < spread)
+      for (let x=0; x<this.size; x++)
       {
-        this.data.push(
-          new CellType()
-        );
+        if (Math.random() < spread)
+        {
+          this.data.push(
+            new CellType(new Vector2(x, y), new Vector2(this.size, this.size))
+          );
+
+          var r = new PIXI.Graphics();
+
+          r.beginFill(0xffffff);
+          r.drawRect(0,0,this.scale, this.scale);
+          r.endFill();
+          r.x = x * this.scale;
+          r.y = y * this.scale;
+          this.graphics.push(r);
+          this.stage.addChild(r);
+
+          done++;
+        }
+        if (done == max) break;
       }
+      if (done == max) break;
     }
 
   }
 
   render()
   {
-    //this.renderer.render(this.data);
+    // for (let l=this.data.length, i=0; i<l; i++)
+    // {
+    //   let e = this.data[i];
+    //   let c = e.shader();
+    //
+    // }
+    this.renderer.render(this.stage);
   }
 
-  neighbourhood(x, y, r)
-  {
-    // let radius = r || 1;
-    // let num = (radius * 2) + 1;
-    //
-    // let vx = x - radius;
-    // let vy = y - radius;
-    //
-    // let n = this.array2d(num);
-    // let l = [];
-    //
-    // for (let iy=0; iy<num; iy++)
-    // {
-    //   vx = x - radius;
-    //   for (let ix=0; ix<num; ix++)
-    //   {
-    //     n[iy][ix] = this.data[this.wrap(vy)][this.wrap(vx)];
-    //     l.push(this.data[this.wrap(vy)][this.wrap(vx)]);
-    //     vx++;
-    //   }
-    //   vy++;
-    // }
-    //
-    // return {
-    //   cells: n,
-    //   linear: l,
-    //   radius: radius,
-    //   subject: this.data[y][x]
-    // }
-  }
+
 
   wrap(v)
   {
@@ -84,32 +93,70 @@ export default class OpenWorld
     return d;
   }
 
-  vertical()
+  evolve()
   {
-    // let next = this.array2d(this.size);
-    //
-    // // this.prepare();
-    // //
-    // // for (let y=0; y<this.size; y++)
-    // // {
-    // //   for (let x=0; x<this.size; x++)
-    // //   {
-    // //     if (this.data[y][x])
-    // //       next[y][x] = this.data[y][x].mutate(this.neighbourhood(x,y));
-    // //   }
-    // // }
-    //
-    // this.data = next;
+    this.prepare();
+
+    let statistics = {
+      centroid: this.centroid(),
+      number: this.data.length
+    }
+
+    let radius = 15;
+
+    for (let t=0,l=this.data.length; t<l;t++)
+    {
+      statistics.neighbours = this.neighbourhood(t, radius);
+
+      this.data[t].mutate(statistics);
+
+      if (this.data[t].dirty)
+      {
+        this.graphics[t].x = Math.round(this.data[t].position.x * this.scale);
+        this.graphics[t].y = Math.round(this.data[t].position.y * this.scale);
+      }
+    }
+
+  }
+
+  // index = lookup for this.data[] (to skip self-test), r = radius in world units
+  neighbourhood(index, r)
+  {
+    let rs = r * r;
+    let n = [];
+    let test = this.data[index].position;
+
+    for (let t=0, l=this.data.length; t<l; t++)
+    {
+      if ( t == index ) continue;
+      let d = this.data[t].position.distsq(test);
+      if ( d <= rs ) n.push(this.data[t]);
+    }
+
+    return n;
+  }
+
+  centroid()
+  {
+    let sx = 0, sy = 0;
+    for (let t=0,l=this.data.length; t<l; t++)
+    {
+      sx += this.data[t].position.x;
+      sy += this.data[t].position.y;
+    }
+
+    return new Vector2(sx / this.data.length, sy, this.data.length);
   }
 
 
   prepare()
   {
+    for (let t=0,l=this.data.length; t<l; t++)
+      this.data[t].prepare();
     // let n = 0;
     // for (let y=0; y<this.size; y++)
     //   for (let x=0; x<this.size; x++)
     //     if (this.data[y][x]) this.data[y][x].prepare();
-
   }
 
 }
