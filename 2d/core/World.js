@@ -1,12 +1,21 @@
 
+import Renderer     from './Renderer2d';
 
 export default class World
 {
   constructor(options)
   {
-
     this.size = options.size; //cells, square
     this.data = null;
+    this.ptype = {};
+
+    this.ptype['vertical'] = this.vertical;
+    this.ptype['swirl'] = this.swirl;
+
+    this.renderer = new Renderer(options.render);
+    this.renderer.scale = options.scale;
+
+    this.evolve = this.ptype[options.process];
 
     this.init(options.type, options.spread);
   }
@@ -36,8 +45,11 @@ export default class World
         }
       }
     }
+  }
 
-
+  render()
+  {
+    this.renderer.render(this.data);
   }
 
   neighbourhood(x, y, r)
@@ -84,7 +96,51 @@ export default class World
     return d;
   }
 
-  evolve()
+  // makes very little difference :/
+  swirl()
+  {
+    let next = this.array2d(this.size);
+    let num = (this.size * this.size) + (this.size * 2);
+    let x = Math.round(this.size / 2);
+    let y = Math.round(this.size / 2);
+    let xd = 1, yd = 1;
+    let visited = 0;
+
+    let iterator = 1;
+    do
+    {
+      for (let xi=0; xi < iterator; xi++)
+      {
+        //can.block(x * VIEW_SCALE, y*VIEW_SCALE, VIEW_SCALE, VIEW_SCALE, col);
+        if (this.data[y][x])
+          next[y][x] = this.data[y][x].mutate(this.neighbourhood(x,y));
+
+        x += xd;
+        visited++;
+        if (x < 0 || x > this.size-1) break;
+      }
+      xd = -xd;
+
+      for (let yi=0; yi < iterator; yi++)
+      {
+
+        //can.block(x * VIEW_SCALE, y*VIEW_SCALE, VIEW_SCALE, VIEW_SCALE, col);
+        if (this.data[y][x])
+          next[y][x] = this.data[y][x].mutate(this.neighbourhood(x,y));
+
+        y += yd;
+        visited++;
+        if (y < 0 || y > this.size-1) break;
+      }
+      yd = -yd;
+
+      iterator += 1;
+    } while(visited < num);
+
+    this.data = next;
+  }
+
+  vertical()
   {
     let next = this.array2d(this.size);
 

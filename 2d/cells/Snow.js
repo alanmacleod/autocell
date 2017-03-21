@@ -43,13 +43,11 @@ class Snow extends Cell
     //return palette [ this.value() ];
   }
 
-
   value(v)
   {
     if (v == undefined) return this.state;
     this.state = v;
   }
-
 
   mutate(entity)
   {
