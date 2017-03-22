@@ -12,7 +12,7 @@ export default class Boid
   {
     this.bounds = bounds;
     this.speed = 1 + (Math.random() / 4)
-    this.shyness = 2 + (Math.random() * 6);
+    this.shyness = 5 + (Math.random() * 5);
 
     this.velocity = new Vector2(
       (Math.random() - 0.5) * 4,
@@ -32,24 +32,22 @@ export default class Boid
 
   mutate(stats)
   {
-    // this.velocity = this.velocity
-    //               .add(this.cohesion(stats.centroid))
-    //               // .add(this.spacing(stats.neighbours))
-    //               // .add(this.rate(stats.neighbours))
-    //               .norm();
+    this.velocity = this.velocity
+                    .add(this.separate(stats.neighbours, this.shyness))
+                    .add(this.align(stats.neighbours))
+                    //.add(this.cohesion2(stats.neighbours))
+                    //.add( this.cohesion( stats.centroid ) )
+                    .add(this.seek(stats.mouse))
+                    .norm();
 
-//console.log(this.cohesion(stats.centroid).norm())
-    // this.velocity = this.velocity.add(this.cohesion(stats.neighbours))
-    // .mul(Math.random())
-    // .add(this.spacing(stats.neighbours))
-    // .norm();
+    //console.log( this.align( stats.neighbours ) );
 
-    this.velocity = this.velocity.add(this.separate(stats.neighbours, this.shyness)).norm()
-    .add(this.seek(stats.mouse)).mul(this.speed);
+
+
+
 
     this.position = this.position.add(this.velocity);
 
-    //console.log(this.position);
 
     this.bound();
     this.dirty = true;
@@ -77,6 +75,61 @@ export default class Boid
     return steer;
   }
 
+  align2(neighbours)
+  {
+    let distsq = 20 * 20;
+
+    let c = new Vector2(0,0);
+    let num = 0;
+
+    for (let t=0; t< neighbours.length; t++)
+    {
+      let d = neighbours[t].position.distsq(this.position);
+      if (d > 0 && d < distsq)
+      {
+        c = c.add(neighbours[t].velocity);
+        num++;
+      }
+    }
+
+    if (!num) return c;
+
+    return c.div(num).norm().mul(1.5).sub(this.velocity).norm();
+
+  }
+
+  cohesion2(neighbours)
+  {
+    let c = new Vector2(0,0)
+    if (neighbours.length == 0) return c;
+
+
+    for (let t=0; t<neighbours.length; t++)
+      c = c.add(neighbours[t].position);
+
+    //console.log( neighbours.length );
+
+    //return this.cohesion( c.div( neighbours.length ) );
+    //return c.div(neighbours.length).norm().sub(this.position);
+    return this.seek(c.div(neighbours.length));
+
+  }
+
+  align(neighbours)
+  {
+    let c = new Vector2(0,0)
+    if (neighbours.length == 0) return c;
+
+
+    for (let t=0; t<neighbours.length; t++)
+      c = c.add(neighbours[t].velocity);
+
+    //console.log( neighbours.length );
+
+    //return this.cohesion( c.div( neighbours.length ) );
+    return c.div(neighbours.length).norm().sub(this.velocity);
+  }
+
   separate(neighbours, spacing)
   {
     let spacingsq = spacing * spacing;
@@ -93,13 +146,13 @@ export default class Boid
       if (d < spacingsq)
       {
         let diff = this.position.sub(neighbours[t].position).norm();
-        c = c.add(diff);
+        c = c.add(diff.div(d));
         num++;
       }
 
       if (!num) return c;
 
-      c = c.div(num).mul(2);
+      c = c.div(num).norm();
 
       return c.sub(this.velocity).norm();
 
@@ -120,11 +173,8 @@ export default class Boid
   cohesion(target)
   {
     return target.sub(this.position)
-                 .norm()
                  .sub(this.velocity)
-                 .norm()
-                 ;
-
+                 .norm();
   }
 
   bound()

@@ -109,10 +109,11 @@ export default class OpenWorld
     let statistics = {
       centroid: this.centroid(),
       number: this.data.length,
-      mouse: this.mouse.div(this.scale)
+      mouse: this.mouse.div(this.scale),
+      all: this.data
     }
 
-    let radius = 10;
+    let radius = 50;
 
     for (let t=0,l=this.data.length; t<l;t++)
     {
