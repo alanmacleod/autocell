@@ -113,7 +113,7 @@ export default class OpenWorld
       all: this.data
     }
 
-    let radius = 50;
+    let radius = 100;
 
     for (let t=0,l=this.data.length; t<l;t++)
     {

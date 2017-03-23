@@ -12,7 +12,7 @@ export default class Boid
   {
     this.bounds = bounds;
     this.speed = 1 + (Math.random() / 4)
-    this.shyness = 5 + (Math.random() * 5);
+    this.shyness = 10 + (Math.random() * 10);
 
     this.velocity = new Vector2(
       (Math.random() - 0.5) * 4,
@@ -37,7 +37,7 @@ export default class Boid
                     .add(this.align(stats.neighbours))
                     //.add(this.cohesion2(stats.neighbours))
                     //.add( this.cohesion( stats.centroid ) )
-                    .add(this.seek(stats.mouse))
+                    //.add(this.seek(stats.mouse))
                     .norm();
 
     //console.log( this.align( stats.neighbours ) );
@@ -127,7 +127,7 @@ export default class Boid
     //console.log( neighbours.length );
 
     //return this.cohesion( c.div( neighbours.length ) );
-    return c.div(neighbours.length).norm().sub(this.velocity);
+    return c.div(neighbours.length).norm().mul(this.speed).sub(this.velocity);
   }
 
   separate(neighbours, spacing)
