@@ -20,7 +20,8 @@ export default class Boid
     )
 
     // console.log(this.velocity);
-    this.position =  new Vector2(Math.random() * this.bounds.x, Math.random() * this.bounds.y);
+   this.position =  new Vector2(Math.random() * this.bounds.x, Math.random() * this.bounds.y);
+    //this.position =  new Vector2(Math.random() * 10, Math.random() * 10);
     this.prepare();
 
   }
@@ -35,7 +36,7 @@ export default class Boid
     this.velocity = this.velocity
                     .add(this.separate(stats.neighbours, this.shyness))
                     .add(this.align(stats.neighbours))
-                    //.add(this.cohesion2(stats.neighbours))
+                    .add(this.cohesion2(stats.neighbours))
                     //.add( this.cohesion( stats.centroid ) )
                     //.add(this.seek(stats.mouse))
                     .norm();
@@ -105,13 +106,13 @@ export default class Boid
 
 
     for (let t=0; t<neighbours.length; t++)
-      c = c.add(neighbours[t].position);
+      if (t & 1) c = c.add(neighbours[t].position);
 
     //console.log( neighbours.length );
 
     //return this.cohesion( c.div( neighbours.length ) );
     //return c.div(neighbours.length).norm().sub(this.position);
-    return this.seek(c.div(neighbours.length));
+    return this.seek(c.div(neighbours.length).mul(.8));
 
   }
 
@@ -183,6 +184,12 @@ export default class Boid
     this.position.y = this.wrap(this.position.y, this.bounds.y);
   }
 
+  // wrap(v, max)
+  // {
+  //   if ( v < 0 ) 0
+  //   if ( v > max-1) return max-1;
+  //   return v;
+  // }
 
   wrap(v, max)
   {
