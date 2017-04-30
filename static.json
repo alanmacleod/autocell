@@ -1,3 +1,7 @@
 {
-  "root": "/"
+  "encoding": "UTF-8",
+  "logging": {
+    "access": true,
+    "error": "debug"
+  }
 }
