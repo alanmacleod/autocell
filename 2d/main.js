@@ -11,9 +11,9 @@ import Canvas2d from '../shared/Canvas2d';
 
 // "boids"
 
-const SIZE = 74; // cells
-const VIEW_SCALE = 12;
-const WORLD_FRAME_RATE = 20;
+const SIZE = 150; // cells
+const VIEW_SCALE = 6;
+const WORLD_FRAME_RATE = 30;
 //
 // let can = new Canvas2d("content");
 // can.resize(SIZE * VIEW_SCALE, SIZE * VIEW_SCALE);
@@ -108,7 +108,7 @@ let world = new World({
   size: SIZE,
   spread: 1.0,
   process: 'vertical',
-  type: GameOfLife,
+  type: Flood,
   render: 'content',
   scale: VIEW_SCALE
 });
@@ -134,7 +134,7 @@ function render()
 
   if (frames++ == 10)
   {
-    fpsText.innerHTML = (avFrames / 10).toFixed(1) + " FPS";
+  //  fpsText.innerHTML = (avFrames / 10).toFixed(1) + " FPS";
     frames = 0;
     avFrames = 0;
   }
