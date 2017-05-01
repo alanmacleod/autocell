@@ -17,10 +17,10 @@ export default class GameOfLife extends Cell
   }
 
   shader()
-  {    
-    return palette[ this.alive ];
+  {
+    return this.alive ? palette[this.alive] : null;
+    //return palette[ this.alive ];
   }
-
 
   evaluate()
   {
@@ -34,6 +34,10 @@ export default class GameOfLife extends Cell
     this.alive = (v == 0) ? DEAD : ALIVE;
   }
 
+  prepare()
+  {
+    this.needsUpdate = false;
+  }
 
   mutate(cells)
   {

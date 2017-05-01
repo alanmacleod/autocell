@@ -7,7 +7,7 @@ import Burrow       from './cells/Burrow';
 import Blur         from './cells/Blur';
 import Snow         from './cells/Snow';
 //import Renderer     from './Renderer2d';
-import Canvas2d from '../shared/Canvas2d';
+//import Canvas2d from '../shared/Canvas2d';
 
 // "boids"
 
