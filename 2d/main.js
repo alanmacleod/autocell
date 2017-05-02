@@ -11,8 +11,8 @@ import Snow         from './cells/Snow';
 
 // "boids"
 
-const SIZE = 150; // cells
-const VIEW_SCALE = 6;
+const SIZE = 50; // cells
+const VIEW_SCALE = 8;
 const WORLD_FRAME_RATE = 30;
 //
 // let can = new Canvas2d("content");
@@ -108,7 +108,7 @@ let world = new World({
   size: SIZE,
   spread: 1.0,
   process: 'vertical',
-  type: Flood,
+  type: GameOfLife,
   render: 'content',
   scale: VIEW_SCALE
 });

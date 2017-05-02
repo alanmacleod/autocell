@@ -13,26 +13,32 @@ export default class GameOfLife extends Cell
   constructor()
   {
     super();
-    this.alive = Math.round(Math.random());
+    this.alive = [Math.round(Math.random()), 0];
+    this.alivei = 0;
   }
 
   shader()
   {
-    return this.alive ? palette[this.alive] : null;
+    return this.alive[this.alivei] ? palette[this.alive[this.alivei]] : null;
     //return palette[ this.alive ];
+  }
+
+  isAlive()
+  {
+    return this.alive[this.alivei];
   }
 
   evaluate()
   {
-    return this.alive ? 1 : 0;
+    return this.alive[this.alivei] ? 1 : 0;
   }
 
   // // Gets or assigns a 'value' to feedback into the Cell 'interface' counting method
-  value(v)
-  {
-    if (v === undefined) return this.alive ? 1 : 0;
-    this.alive = (v == 0) ? DEAD : ALIVE;
-  }
+  // value(v)
+  // {
+  //   if (v === undefined) return this.alive ? 1 : 0;
+  //   this.alive = (v == 0) ? DEAD : ALIVE;
+  // }
 
   prepare()
   {
@@ -42,21 +48,25 @@ export default class GameOfLife extends Cell
   mutate(cells)
   {
     let n = this.numLiveNeighbours(cells);
-    let me = new GameOfLife();
+
+    let ai = cells.subject.alivei;
+    let curState = cells.subject.alive[ai];
     let newState = DEAD;
 
-    if (cells.subject.alive && n < 2)
+    if (curState && n < 2)
       newState = DEAD;
-    else if (cells.subject.alive && n > 3)
+    else if (curState && n > 3)
       newState = DEAD;
-    else if (!cells.subject.alive && n == 3)
+    else if (!curState && n == 3)
       newState = ALIVE;
     else
-      newState = cells.subject.value();
+      newState = curState;
 
-    me.value(newState);
+    cells.subject.alive[1 - ai] = newState;
+    //cells.subject.alivei = 1 - ai;
+    cells.subject.needsUpdate = (curState != newState);
 
-    return me;
+    //return me;
   }
 
 }

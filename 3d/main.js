@@ -1,29 +1,20 @@
 
-import World        from './core/World';
-import GameOfLife   from './cells/GoL';
-// import Flood        from './cells/Flood';
-// import Burrow       from './cells/Burrow';
-// import Blur         from './cells/Blur';
-// import Snow         from './cells/Snow';
-//import Renderer     from './Renderer2d';
-// import Canvas2d from '../shared/Canvas2d';
-// "boids"
+//import World        from './core/World3d';
+//import GameOfLife   from './cells/GoL';
+import GameOfLife3d     from './core/GameOfLife3d';
 
-const SIZE = 100; // cells
+const SIZE = 50; // cells
 const VIEW_SCALE = 50;
-const WORLD_FRAME_RATE = 25;
+const WORLD_FRAME_RATE = 2;
 
-
-let world = new World({
+let world = new GameOfLife3d({
   size: SIZE,
   spread: 1.0,
-  process: 'vertical',
-  type: GameOfLife,
   render: 'content',
   scale: VIEW_SCALE
 });
 
-world.evolve();
+//world.evolve();
 world.render();
 
 window.requestAnimationFrame(render);
