@@ -1,22 +1,24 @@
 
-//import World        from './core/World3d';
-//import GameOfLife   from './cells/GoL';
-import GameOfLife3d     from './core/GameOfLife3d';
+import GameOfLife3d     from './cells/GoL-3d.js';
+import World3d          from './core/World-3d.js'
 
-const SIZE = 50; // cells
+const SIZE = 30; // cells^3
 const VIEW_SCALE = 50;
-const WORLD_FRAME_RATE = 2;
+const WORLD_FRAME_RATE = 20;
 
-let world = new GameOfLife3d({
+let world = new World3d({
   size: SIZE,
   spread: 1.0,
   render: 'content',
+  type: GameOfLife3d,
   scale: VIEW_SCALE
 });
 
-//world.evolve();
-world.render();
+//world.render();
 
+//world.evolve();
+// world.render();
+//
 window.requestAnimationFrame(render);
 window.setInterval(() => { world.evolve() }, 1000 / WORLD_FRAME_RATE);
 
