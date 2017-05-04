@@ -22,7 +22,6 @@ export default class SpatialGrid
     this.ycellsize = this.height / cells;
 
     this.maxRadius = (Math.sqrt(this.width * this.width + this.height * this.height));
-
   }
 
   // Expects: `item` contains `x` and `y` properties

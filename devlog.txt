@@ -1,0 +1,20 @@
+
+Cellular Automata development log
+
+Implement 1d and 2d variations simple enough.
+
+3d another matter, exponential increase in size.
+
+Original plan to use voxels and render as cubes a la minecraft. However
+dumb 'brute force' approach proved impractical > 1000. Considered ray tracing
+for vis/occlusion culling, seemed overkill. Examined minecraft technique,
+seems it's an algorithm that unifies nearby similar geometries and renders
+as a solid mesh. This will not work for my non-uniform, almost random, cellular
+behaviour. I'm essentially trying to solve the toughest "noise" case.
+
+Compromise
+----------
+Implemented a 3d point cloud which worked but wasn't visually striking enough.
+At this point, realise delving any further would be 80% writing a 3d engine and
+thus losing sight of the original objective. So opt for pseudo-3d (2d blocks
+on a 3d terrain) and go for real 3d with birds demo as the dataset is much smaller.
