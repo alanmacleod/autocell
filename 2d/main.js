@@ -1,5 +1,6 @@
 
 
+import SpatialGrid  from './core/SpatialGrid';
 import World        from './core/World.js';
 import GameOfLife   from './cells/GoL';
 import Flood        from './cells/Flood';
@@ -98,47 +99,66 @@ const WORLD_FRAME_RATE = 30;
 // console.log("Time taken: ", ttaken);
 // //
 
+let g = new SpatialGrid(0, 0, 100, 100, 3);
 
 
-let fpsText = document.getElementById("fps");
+g.add({x: 17, y:17, id:0});
+g.add({x: 18, y:18, id:1});
+g.add({x: 1, y:1, id:2});
+g.add({x: 2, y:2, id:3});
+g.add({x: 33, y:33, id:4});
+g.add({x: 66, y:66, id:4});
 
-let lastTime = 0, frames = 0, avFrames = 0;
-
-let world = new World({
-  size: SIZE,
-  spread: 1.0,
-  process: 'vertical',
-  type: GameOfLife,
-  render: 'content',
-  scale: VIEW_SCALE
-});
+console.log(g.query(3, 3, 1000));
 
 
-// world.evolve();
-// renderer.render(world.data);
+
+// g.query(99, 99, 4);
+
+//console.log(g);
 //
-// console.log(world.data);
-
-window.world = world;
-
-window.requestAnimationFrame(render);
-window.setInterval(() => { world.evolve() }, 1000 / WORLD_FRAME_RATE);
-
-function render()
-{
-  let timeNow = performance.now();
-  let timeTaken = timeNow - lastTime;
-
-  avFrames +=  1000 / timeTaken;
-  lastTime = timeNow;
-
-  if (frames++ == 10)
-  {
-  //  fpsText.innerHTML = (avFrames / 10).toFixed(1) + " FPS";
-    frames = 0;
-    avFrames = 0;
-  }
-
-  world.render();
-  window.requestAnimationFrame(render);
-}
+//
+//
+//
+// let fpsText = document.getElementById("fps");
+//
+// let lastTime = 0, frames = 0, avFrames = 0;
+//
+// let world = new World({
+//   size: SIZE,
+//   spread: 1.0,
+//   process: 'vertical',
+//   type: GameOfLife,
+//   render: 'content',
+//   scale: VIEW_SCALE
+// });
+//
+//
+// // world.evolve();
+// // renderer.render(world.data);
+// //
+// // console.log(world.data);
+//
+// window.world = world;
+//
+// window.requestAnimationFrame(render);
+// window.setInterval(() => { world.evolve() }, 1000 / WORLD_FRAME_RATE);
+//
+// function render()
+// {
+//   let timeNow = performance.now();
+//   let timeTaken = timeNow - lastTime;
+//
+//   avFrames +=  1000 / timeTaken;
+//   lastTime = timeNow;
+//
+//   if (frames++ == 10)
+//   {
+//   //  fpsText.innerHTML = (avFrames / 10).toFixed(1) + " FPS";
+//     frames = 0;
+//     avFrames = 0;
+//   }
+//
+//   world.render();
+//   window.requestAnimationFrame(render);
+// }
