@@ -20,6 +20,9 @@ export default class SpatialGrid
     this.numcells = cells;
     this.xcellsize = this.width  / cells;
     this.ycellsize = this.height / cells;
+
+    this.maxRadius = (Math.sqrt(this.width * this.width + this.height * this.height));
+
   }
 
   // Expects: `item` contains `x` and `y` properties
@@ -66,6 +69,8 @@ export default class SpatialGrid
   // returns all objects in radius r from point x,y
   query(x, y, r)
   {
+    if (r > this.maxRadius) r = this.maxRadius;
+
     // Squared distance
     let rsq = r * r;
 
@@ -79,10 +84,12 @@ export default class SpatialGrid
     let cellmaxx = ((x + r) - (this.mod((x + r), this.xcellsize))) / this.xcellsize;
     let cellmaxy = ((y + r) - (this.mod((y + r), this.ycellsize))) / this.ycellsize;
 
+  //  console.log(`Checking numcells ${cellmaxx - cellminx}, ${cellmaxy - cellminy}`);
+
     let objs = [];
 
-    //FIXME: need a smarter solution to make sure each cell is visited only once
-    let once = this.array2d(this.numcells, this.numcells, 0);
+    if ((cellmaxy - cellminy) >= this.numcells) cellmaxy = cellminy + this.numcells - 1;
+    if ((cellmaxx - cellminx) >= this.numcells) cellmaxx = cellminx + this.numcells - 1;
 
     for (let cy=cellminy; cy<=cellmaxy; cy++)
     {
@@ -90,8 +97,8 @@ export default class SpatialGrid
       {
         let wx = this.wrap(cx), wy = this.wrap(cy);
 
-        if (once[wy][wx]) continue;
-        once[wy][wx] = 1;
+        // if (once[wy][wx]) continue;
+        // once[wy][wx] = 1;
 
         let cell = this.grid[wy][wx]
         if (!cell) continue;

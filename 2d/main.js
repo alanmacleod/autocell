@@ -109,14 +109,14 @@ g.add({x: 2, y:2, id:3});
 g.add({x: 33, y:33, id:4});
 g.add({x: 66, y:66, id:4});
 
-console.log(g.query(3, 3, 1000));
+var t1= performance.now();
+for (var t=0; t< 10000; t++)
+  g.query(3, 3, 50);
+
+console.log(`Took ${performance.now() - t1} ms`);
 
 
 
-// g.query(99, 99, 4);
-
-//console.log(g);
-//
 //
 //
 //
