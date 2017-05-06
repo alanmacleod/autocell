@@ -6,7 +6,7 @@ const PALETTE = [
   [0,0,128]
 ];
 
-// How hard to put on the brakes! 0.0=hard, 0.99=soft
+// How hard to put on the brakes; 0.0=hard, 0.99=soft
 const DECEL_RATE = 0;
 
 // How close to a predator until a boid gets scared
@@ -28,9 +28,6 @@ export default class Boid
     this.maxVelocity = 3 + (Math.random());
     this.maxSteer = 0.1;
 
-    // Very bizarrely, I need to slightly bias the x velocity to head east
-    // If not, they head west most of the time. Weird. Random number problem?
-
     this.velocity = new Vector2(
       Math.random() * 2 - 1,
       Math.random() * 2 - 1
@@ -51,6 +48,7 @@ export default class Boid
     return PALETTE[0];
   }
 
+  // For each boid we follow these steps
   mutate(stats)
   {
     // Calculate and sum correction vectors into 'accelerate' vector
@@ -95,8 +93,7 @@ export default class Boid
     this.accelerate = this.accelerate
                       .add(this.alignment( neighbours ))
                       .add(this.cohesion( neighbours ))
-                      .add(this.separation( neighbours ))
-                      ;
+                      .add(this.separation( neighbours ));
   }
 
   // Head towards
@@ -133,6 +130,7 @@ export default class Boid
     return steer.mul( 0.5 / d );
   }
 
+  // Head in the same direction
   alignment(neighbours)
   {
     let c = new Vector2();
@@ -162,6 +160,7 @@ export default class Boid
     return c;
   }
 
+  // Bundle together
   cohesion(neighbours)
   {
     let c = new Vector2();
@@ -194,6 +193,7 @@ export default class Boid
     return steer;
   }
 
+  // Try not to collide
   separation(neighbours)
   {
     let c = new Vector2(); // summed correction vector
@@ -214,13 +214,6 @@ export default class Boid
     }
 
     return c;
-  }
-
-  seekold(target)
-  {
-    let desired = target.sub(this.position).norm();
-    let steer = desired.sub(this.velocity).norm().mul(0.7)
-    return steer;
   }
 
   bound()
