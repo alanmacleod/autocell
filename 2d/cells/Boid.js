@@ -25,7 +25,7 @@ export default class Boid
   {
     this.bounds = bounds;
 
-    this.maxVelocity = 3 + (Math.random());
+    this.maxVelocity = 2 + (Math.random());
     this.maxSteer = 0.1;
 
     this.velocity = new Vector2(
@@ -72,6 +72,10 @@ export default class Boid
 
   move()
   {
+    // Move half of the boids away from the world edge, wrap the other half
+    if (Math.random() > 0.8)
+      this.bound();
+
     this.velocity.tadd( this.accelerate );
     let m = this.velocity.mag();
 
@@ -80,7 +84,7 @@ export default class Boid
 
     this.position.tadd( this.velocity );
 
-    this.bound();
+    this.bound2();
 
     this.accelerate.tmul( DECEL_RATE );
 
@@ -94,6 +98,24 @@ export default class Boid
                       .add(this.alignment( neighbours ))
                       .add(this.cohesion( neighbours ))
                       .add(this.separation( neighbours ));
+  }
+
+  bound()
+  {
+    let buffer = 10;
+
+    let left = this.avoid( new Vector2( 0, this.position.y ) );
+    let right = this.avoid( new Vector2( this.bounds.x, this.position.y ) );
+    let top = this.avoid( new Vector2( this.position.x, 0 ) );
+    let bottom = this.avoid( new Vector2( this.position.x, this.bounds.y ) );
+
+    left.tmul( buffer );
+    right.tmul( buffer );
+    top.tmul( buffer );
+    bottom.tmul( buffer );
+
+    this.accelerate.tadd( left.add(right).add(top).add(bottom) );
+
   }
 
   // Head towards
@@ -216,7 +238,7 @@ export default class Boid
     return c;
   }
 
-  bound()
+  bound2()
   {
     this.position.x = this.wrap(this.position.x, this.bounds.x);
     this.position.y = this.wrap(this.position.y, this.bounds.y);

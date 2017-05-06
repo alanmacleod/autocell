@@ -3,7 +3,7 @@
 import Vector2  from '../math/Vector2.js';
 let PIXI = require('pixi.js');    // ffs update your module defs, PIXI
 
-const NEIGHBOUR_RADIUS = 50;
+const NEIGHBOUR_RADIUS = 75;
 
 export default class OpenWorld
 {
