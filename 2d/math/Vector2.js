@@ -2,10 +2,10 @@
 
 export default class Vector2
 {
-  constructor(x, y)
+  constructor(x=0, y=0)
   {
-    this.x = 0 || x;
-    this.y = 0 || y;
+    this.x = x;
+    this.y = y;
   }
 
   set(x, y)
@@ -14,9 +14,11 @@ export default class Vector2
     return this;
   }
 
+  // Create new vectors
+
   sub(b)
   {
-    return new Vector2(b.x - this.x, b.y - this.y);
+    return new Vector2(this.x - b.x, this.y - b.y);
   }
 
   add(b)
@@ -29,15 +31,48 @@ export default class Vector2
     return new Vector2(this.x * s, this.y * s);
   }
 
+
   div(s)
   {
     return new Vector2(this.x / s, this.y / s);
   }
 
+  // Arithmetic in-place
+
+  tsub(b)
+  {
+    this.x -= b.x;
+    this.y -= b.y;
+  }
+
+  tadd(b)
+  {
+    this.x += b.x;
+    this.y += b.y;
+  }
+
+  tmul(s)
+  {
+    this.x *= s;
+    this.y *= s;
+  }
+
+  tdiv(s)
+  {
+    this.x /= s;
+    this.y /= s;
+  }
+
+  tnorm()
+  {
+    let m = this.mag();
+    return m ? this.tdiv(m) : this;
+  }
+
   norm()
   {
     let m = this.mag();
-    return m ? this.div(m) : this;
+    return m ? this.div(m) : new Vector2(this.x, this.y);
   }
 
   mag()

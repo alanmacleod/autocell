@@ -9,6 +9,7 @@ import Blur         from './cells/Blur';
 import Snow         from './cells/Snow';
 import Boid         from './cells/Boid'
 import OpenWorld    from './core/OpenWorld';
+//import Vector2  from './math/Vector2';
 
 //import Renderer     from './Renderer2d';
 //import Canvas2d from '../shared/Canvas2d';
@@ -17,7 +18,7 @@ import OpenWorld    from './core/OpenWorld';
 
 const SIZE = 100; // cells
 const VIEW_SCALE = 4;
-const WORLD_FRAME_RATE = 30;
+const WORLD_FRAME_RATE = 25;
 //
 // let can = new Canvas2d("content");
 // can.resize(SIZE * VIEW_SCALE, SIZE * VIEW_SCALE);

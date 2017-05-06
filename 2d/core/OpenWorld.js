@@ -99,11 +99,11 @@ export default class OpenWorld
       all: this.data
     }
 
-    let radius = 100;
+    let neighbourRadius = 50;
 
     for (let t=0,l=this.data.length; t<l;t++)
     {
-      statistics.neighbours = this.neighbourhood(t, radius);
+      statistics.neighbours = this.neighbourhood(t, neighbourRadius);
 
       this.data[t].mutate(statistics);
 

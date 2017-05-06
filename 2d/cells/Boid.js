@@ -5,6 +5,7 @@ const PALETTE = [
   [0,0,0]
 ];
 
+const DECEL_RATE = 0.33;  // How hard to put on the brakes! 0.0=hard, 0.99=soft
 
 export default class Boid
 {
@@ -14,10 +15,19 @@ export default class Boid
     this.speed = 1 + (Math.random() / 4)
     this.shyness = 10 + (Math.random() * 10);
 
+    this.maxVelocity = 2 + (Math.random());
+
+    // this.velocity = new Vector2(
+    //   (Math.random() - 0.5) * 4,
+    //   (Math.random() - 0.5) * 4
+    // )
+
     this.velocity = new Vector2(
-      (Math.random() - 0.5) * 4,
-      (Math.random() - 0.5) * 4
-    )
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1
+    );
+
+    this.accelerate = new Vector2(0,0);
 
     // console.log(this.velocity);
    this.position =  new Vector2(Math.random() * this.bounds.x, Math.random() * this.bounds.y);
@@ -33,22 +43,78 @@ export default class Boid
 
   mutate(stats)
   {
+    this.flock(stats.neighbours);
+    this.move();
+  }
+
+
+
+  move()
+  {
+    this.velocity.tadd(this.accelerate);
+    let m = this.velocity.mag();
+
+    if (m > this.maxVelocity)
+      this.velocity.tdiv(m / this.maxVelocity);
+
+    this.position.tadd(this.velocity);
+
+    this.accelerate.tmul( DECEL_RATE );
+
+    this.bound();
+    this.dirty = true;
+  }
+
+
+  flock(neighbours)
+  {
+    this.accelerate = this.accelerate
+                      .add(this.falignment(neighbours))
+                      .add(this.fcohesion(neighbours))
+                      .add(this.fseparation(neighbours))
+  }
+
+  falignment(neighbours)
+  {
+    return new Vector2();
+  }
+
+  fcohesion(neighbours)
+  {
+    return new Vector2();
+  }
+
+  fseparation(neighbours)
+  {
+    let c = new Vector2(); // summed correction vector
+    let r = new Vector2();
+
+    for (let t=0; t<neighbours.length; t++)
+    {
+      let d = neighbours[t].position.dist(this.position);
+
+      r = this.position.sub(neighbours[t].position);
+      r.norm();
+
+    }
+
+    //return c.norm();
+    return new Vector2();
+  }
+
+  mutateold(stats)
+  {
     this.velocity = this.velocity
-                    .add(this.separate(stats.neighbours, this.shyness))
-                    .add(this.align(stats.neighbours))
-                    .add(this.cohesion2(stats.neighbours))
+                    //.add(this.separate(stats.neighbours, this.shyness))
+                    //.add(this.align(stats.neighbours))
+                    //.add(this.cohesion2(stats.neighbours))
                     //.add( this.cohesion( stats.centroid ) )
                     //.add(this.seek(stats.mouse))
-                    .norm();
+                  //  .norm();
 
     //console.log( this.align( stats.neighbours ) );
 
-
-
-
-
     this.position = this.position.add(this.velocity);
-
 
     this.bound();
     this.dirty = true;
@@ -125,9 +191,6 @@ export default class Boid
     for (let t=0; t<neighbours.length; t++)
       c = c.add(neighbours[t].velocity);
 
-    //console.log( neighbours.length );
-
-    //return this.cohesion( c.div( neighbours.length ) );
     return c.div(neighbours.length).norm().mul(this.speed).sub(this.velocity);
   }
 
