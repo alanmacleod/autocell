@@ -5,7 +5,7 @@ const PALETTE = [
   [0,0,0]
 ];
 
-const DECEL_RATE = 0.33;  // How hard to put on the brakes! 0.0=hard, 0.99=soft
+const DECEL_RATE = 0.2;  // How hard to put on the brakes! 0.0=hard, 0.99=soft
 
 export default class Boid
 {
@@ -15,12 +15,8 @@ export default class Boid
     this.speed = 1 + (Math.random() / 4)
     this.shyness = 10 + (Math.random() * 10);
 
-    this.maxVelocity = 2 + (Math.random());
-
-    // this.velocity = new Vector2(
-    //   (Math.random() - 0.5) * 4,
-    //   (Math.random() - 0.5) * 4
-    // )
+    this.maxVelocity = 1.5 + (Math.random());
+    this.maxSteer = 0.1;
 
     this.velocity = new Vector2(
       Math.random() * 2 - 1,
@@ -43,7 +39,10 @@ export default class Boid
 
   mutate(stats)
   {
+    // Calculate and sum correction vectors into 'accelerate' vector
     this.flock(stats.neighbours);
+
+    // Apply the movement
     this.move();
   }
 
@@ -59,7 +58,7 @@ export default class Boid
 
     this.position.tadd(this.velocity);
 
-    this.accelerate.tmul( DECEL_RATE );
+    this.accelerate.tmul(DECEL_RATE);
 
     this.bound();
     this.dirty = true;
@@ -76,12 +75,47 @@ export default class Boid
 
   falignment(neighbours)
   {
-    return new Vector2();
+    let v = new Vector2();
+    let num = 0;
+
+    for (let n of neighbours)
+      v.tadd( n.velocity );
+
+    if (neighbours.length == 0)
+      return v;
+
+    v.tdiv( neighbours.length );
+
+    let force = v.mag();
+
+    if (force > this.maxSteer)
+      v.tdiv( force / this.maxSteer );
+
+    return v;
   }
 
   fcohesion(neighbours)
   {
-    return new Vector2();
+    let c = new Vector2();
+    let num = 0;
+
+    for (let n of neighbours)
+    {
+        c.tadd( n.position );
+        num++;
+    }
+
+    if (num)
+      c.tdiv( num );
+
+    let steer = c.sub( this.position );
+
+    let force = steer.mag();
+
+    if (force > this.maxSteer)
+      steer.tdiv( force / this.maxSteer );
+
+    return steer;
   }
 
   fseparation(neighbours)
@@ -93,13 +127,16 @@ export default class Boid
     {
       let d = neighbours[t].position.dist(this.position);
 
-      r = this.position.sub(neighbours[t].position);
-      r.norm();
-
+      if ( Math.random() < 0.6 )
+      {
+        r = this.position.sub(neighbours[t].position);
+        r.tnorm();
+        r.tdiv(d);
+        c.tadd(r);
+      }
     }
 
-    //return c.norm();
-    return new Vector2();
+    return c;
   }
 
   mutateold(stats)

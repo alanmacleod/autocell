@@ -18,3 +18,10 @@ Implemented a 3d point cloud which worked but wasn't visually striking enough.
 At this point, realise delving any further would be 80% writing a 3d engine and
 thus losing sight of the original objective. So opt for pseudo-3d (2d blocks
 on a 3d terrain) and go for real 3d with birds demo as the dataset is much smaller.
+
+
+
+References
+
+1. Flocks, herds and schools: A distributed behavioral model (http://dl.acm.org/citation.cfm?id=37406)
+2. Nature Of Code: Autonomous Agents (http://natureofcode.com/book/chapter-6-autonomous-agents/)

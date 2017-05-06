@@ -99,7 +99,7 @@ export default class OpenWorld
       all: this.data
     }
 
-    let neighbourRadius = 50;
+    let neighbourRadius = 15;
 
     for (let t=0,l=this.data.length; t<l;t++)
     {
