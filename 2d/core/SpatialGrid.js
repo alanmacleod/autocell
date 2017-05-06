@@ -3,7 +3,7 @@
 // Alan MacLeod 04-May-2017
 //
 // Grid.js
-// Cheap *dynamic* spatial index.
+// Cheap *dynamic* spatial index (2D)
 // Splits an area into a simple grid, each cell keeps track of a list of objects
 // Generally performs better on modern hardware compared to reconstructing a quadtree etc
 // add() or move() objects. Performce nearest neighbour search with query()
@@ -22,6 +22,8 @@ export default class SpatialGrid
     this.ycellsize = this.height / cells;
 
     this.maxRadius = (Math.sqrt(this.width * this.width + this.height * this.height));
+
+    this.foundObjects = [];
   }
 
   // Expects: `item` contains `x` and `y` properties
@@ -65,8 +67,63 @@ export default class SpatialGrid
       return r < 0 ? r + b : r;
   }
 
-  // returns all objects in radius r from point x,y
   query(x, y, r)
+  {
+    if (r > this.maxRadius) r = this.maxRadius;
+
+    // Squared distance
+    let rsq = r * r;
+
+    // Which cell are we in?
+    // let cellcentrex = (x - (this.mod(x, this.xcellsize))) / this.xcellsize;
+    // let cellcentrey = (y - (this.mod(y, this.ycellsize))) / this.ycellsize;
+
+    // Use diagonal extent to find the cell range to search
+    let cellminx = ((x - r) - (this.mod((x - r), this.xcellsize))) / this.xcellsize;
+    let cellminy = ((y - r) - (this.mod((y - r), this.ycellsize))) / this.ycellsize;
+    let cellmaxx = ((x + r) - (this.mod((x + r), this.xcellsize))) / this.xcellsize;
+    let cellmaxy = ((y + r) - (this.mod((y + r), this.ycellsize))) / this.ycellsize;
+
+  //  console.log(`Checking numcells ${cellmaxx - cellminx}, ${cellmaxy - cellminy}`);
+
+    if (cellminx < 0) cellminx = 0;
+    if (cellmaxx >= this.xcellsize) cellmaxx = this.xcellsize-1;
+
+    if (cellminy < 0) cellminy = 0;
+    if (cellmaxy >= this.ycellsize) cellmaxy = this.ycellsize - 1;
+
+    this.foundObjects = [];
+    //
+    // if ((cellmaxy - cellminy) >= this.numcells) cellmaxy = cellminy + this.numcells - 1;
+    // if ((cellmaxx - cellminx) >= this.numcells) cellmaxx = cellminx + this.numcells - 1;
+
+    for (let cy=cellminy; cy<=cellmaxy; cy++)
+    {
+      for (let cx=cellminx; cx<=cellmaxx; cx++)
+      {
+        // let wx = this.wrap(cx), wy = this.wrap(cy);
+
+        // if (once[wy][wx]) continue;
+        // once[wy][wx] = 1;
+
+        let cell = this.grid[cy][cx]
+        if (!cell) continue;
+
+        for (let t=0; t<cell.length; t++)
+        {
+            let item = cell[t];
+            let d = this.distsq(item.x, item.y, x, y);
+            if (d <= rsq) this.foundObjects.push(item);
+        }
+      }
+    }
+
+    return this.foundObjects;
+  }
+
+
+  // returns all objects in radius r from point x,y
+  querywrap(x, y, r)
   {
     if (r > this.maxRadius) r = this.maxRadius;
 

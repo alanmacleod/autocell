@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "babel-core": "^6.18.2",
+    "pixi.js": "^4.5.1",
     "three": "^0.84.0"
   },
   "devDependencies": {
@@ -27,7 +28,9 @@
     "automata"
   ],
   "ava": {
-    "require": ["babel-register"]
+    "require": [
+      "babel-register"
+    ]
   },
   "author": "Alan MacLeod",
   "license": "MIT",

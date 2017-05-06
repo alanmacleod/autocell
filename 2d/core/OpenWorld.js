@@ -19,21 +19,7 @@ export default class OpenWorld
     this.element.appendChild(this.renderer.view);
     this.mouse = new Vector2(0,0);
 
-    //this.interaction = new PIXI.interaction.InteractionManager(this.renderer);
     this.element.onmousemove = (e) => { this.mouse.set(e.clientX, e.clientY);}
-
-
-    //this.interaction
-
-    // this.ptype = {};
-    //
-    // this.ptype['vertical'] = this.vertical;
-    // this.ptype['swirl'] = this.swirl;
-
-    // this.renderer = new Renderer(options.render);
-    // this.renderer.scale = options.scale;
-
-    // this.evolve = this.ptype[options.process];
 
     this.init(options.type, options.spread);
   }

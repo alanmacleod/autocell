@@ -7,13 +7,16 @@ import Flood        from './cells/Flood';
 import Burrow       from './cells/Burrow';
 import Blur         from './cells/Blur';
 import Snow         from './cells/Snow';
+import Boid         from './cells/Boid'
+import OpenWorld    from './core/OpenWorld';
+
 //import Renderer     from './Renderer2d';
 //import Canvas2d from '../shared/Canvas2d';
 
 // "boids"
 
-const SIZE = 50; // cells
-const VIEW_SCALE = 8;
+const SIZE = 100; // cells
+const VIEW_SCALE = 4;
 const WORLD_FRAME_RATE = 30;
 //
 // let can = new Canvas2d("content");
@@ -99,66 +102,72 @@ const WORLD_FRAME_RATE = 30;
 // console.log("Time taken: ", ttaken);
 // //
 
-let g = new SpatialGrid(0, 0, 100, 100, 3);
+// 10,000 items in a 10,000 x 10,1000 grid  = 4ms
 
-
-g.add({x: 17, y:17, id:0});
-g.add({x: 18, y:18, id:1});
-g.add({x: 1, y:1, id:2});
-g.add({x: 2, y:2, id:3});
-g.add({x: 33, y:33, id:4});
-g.add({x: 66, y:66, id:4});
-
-var t1= performance.now();
-for (var t=0; t< 10000; t++)
-  g.query(3, 3, 50);
-
-console.log(`Took ${performance.now() - t1} ms`);
-
-
-
+// let g = new SpatialGrid(0, 0, 10000, 10000, 100);
 //
-//
-//
-// let fpsText = document.getElementById("fps");
-//
-// let lastTime = 0, frames = 0, avFrames = 0;
-//
-// let world = new World({
-//   size: SIZE,
-//   spread: 1.0,
-//   process: 'vertical',
-//   type: GameOfLife,
-//   render: 'content',
-//   scale: VIEW_SCALE
-// });
-//
-//
-// // world.evolve();
-// // renderer.render(world.data);
-// //
-// // console.log(world.data);
-//
-// window.world = world;
-//
-// window.requestAnimationFrame(render);
-// window.setInterval(() => { world.evolve() }, 1000 / WORLD_FRAME_RATE);
-//
-// function render()
+// for (var t=0; t< 20000; t++)
 // {
-//   let timeNow = performance.now();
-//   let timeTaken = timeNow - lastTime;
-//
-//   avFrames +=  1000 / timeTaken;
-//   lastTime = timeNow;
-//
-//   if (frames++ == 10)
-//   {
-//   //  fpsText.innerHTML = (avFrames / 10).toFixed(1) + " FPS";
-//     frames = 0;
-//     avFrames = 0;
-//   }
-//
-//   world.render();
-//   window.requestAnimationFrame(render);
+//   g.add({x: Math.random() * 10000, y: Math.random() * 10000});
 // }
+//
+// // g.add({x: 17, y:17, id:0});
+// // g.add({x: 18, y:18, id:1});
+// // g.add({x: 1, y:1, id:2});
+// // g.add({x: 2, y:2, id:3});
+// // g.add({x: 33, y:33, id:4});
+// // g.add({x: 66, y:66, id:4});
+//
+// var t1= performance.now();
+// for (var t=0; t< 20000; t++)
+//   g.query(3, 3, 110);
+//
+// console.log(`Took ${performance.now() - t1} ms`);
+//
+
+
+
+
+
+let fpsText = document.getElementById("fps");
+
+let lastTime = 0, frames = 0, avFrames = 0;
+
+let world = new OpenWorld({
+  size: SIZE,
+  spread: 1.0,
+  process: 'vertical',
+  type: Boid,
+  render: 'content',
+  scale: VIEW_SCALE
+});
+
+
+// world.evolve();
+// renderer.render(world.data);
+//
+// console.log(world.data);
+
+window.world = world;
+
+window.requestAnimationFrame(render);
+window.setInterval(() => { world.evolve() }, 1000 / WORLD_FRAME_RATE);
+
+function render()
+{
+  let timeNow = performance.now();
+  let timeTaken = timeNow - lastTime;
+
+  avFrames +=  1000 / timeTaken;
+  lastTime = timeNow;
+
+  if (frames++ == 10)
+  {
+  //  fpsText.innerHTML = (avFrames / 10).toFixed(1) + " FPS";
+    frames = 0;
+    avFrames = 0;
+  }
+
+  world.render();
+  window.requestAnimationFrame(render);
+}
