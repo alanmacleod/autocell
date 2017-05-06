@@ -3,6 +3,7 @@
 import Vector2  from '../math/Vector2.js';
 let PIXI = require('pixi.js');    // ffs update your module defs, PIXI
 
+const NEIGHBOUR_RADIUS = 50;
 
 export default class OpenWorld
 {
@@ -19,7 +20,7 @@ export default class OpenWorld
     this.element.appendChild(this.renderer.view);
     this.mouse = new Vector2(0,0);
 
-    this.element.onmousemove = (e) => { this.mouse.set(e.clientX, e.clientY);}
+    this.element.onmousemove = (e) => { this.mouse.set(e.clientX, e.clientY); }
 
     this.init(options.type, options.spread);
   }
@@ -99,11 +100,9 @@ export default class OpenWorld
       all: this.data
     }
 
-    let neighbourRadius = 15;
-
     for (let t=0,l=this.data.length; t<l;t++)
     {
-      statistics.neighbours = this.neighbourhood(t, neighbourRadius);
+      statistics.neighbours = this.neighbourhood(t, NEIGHBOUR_RADIUS);
 
       this.data[t].mutate(statistics);
 

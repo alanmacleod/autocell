@@ -16,9 +16,9 @@ import OpenWorld    from './core/OpenWorld';
 
 // "boids"
 
-const SIZE = 100; // cells
-const VIEW_SCALE = 4;
-const WORLD_FRAME_RATE = 25;
+const SIZE = 500; // cells
+const VIEW_SCALE = 2;
+const WORLD_FRAME_RATE = 45;
 //
 // let can = new Canvas2d("content");
 // can.resize(SIZE * VIEW_SCALE, SIZE * VIEW_SCALE);

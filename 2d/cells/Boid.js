@@ -1,35 +1,49 @@
 
+
 import Vector2  from '../math/Vector2';
 
 const PALETTE = [
-  [0,0,0]
+  [0,0,128]
 ];
 
-const DECEL_RATE = 0.2;  // How hard to put on the brakes! 0.0=hard, 0.99=soft
+// How hard to put on the brakes! 0.0=hard, 0.99=soft
+const DECEL_RATE = 0;
+
+// How close to a predator until a boid gets scared
+const PREDATOR_DANGER = 50;
+
+// Between 0..1, lower means ignore more neighbours
+const FUZZY_NEIGHBOURS = 0.6;
+
+// Attraction radius of e.g. mouse cursor
+const SEEK_INTEREST_RANGE = 50;
+
 
 export default class Boid
 {
   constructor(position, bounds)
   {
     this.bounds = bounds;
-    this.speed = 1 + (Math.random() / 4)
-    this.shyness = 10 + (Math.random() * 10);
 
-    this.maxVelocity = 1.5 + (Math.random());
+    this.maxVelocity = 3 + (Math.random());
     this.maxSteer = 0.1;
+
+    // Very bizarrely, I need to slightly bias the x velocity to head east
+    // If not, they head west most of the time. Weird. Random number problem?
 
     this.velocity = new Vector2(
       Math.random() * 2 - 1,
       Math.random() * 2 - 1
     );
 
-    this.accelerate = new Vector2(0,0);
+    this.accelerate = new Vector2();
 
-    // console.log(this.velocity);
-   this.position =  new Vector2(Math.random() * this.bounds.x, Math.random() * this.bounds.y);
-    //this.position =  new Vector2(Math.random() * 10, Math.random() * 10);
+    this.position =  new Vector2(
+        Math.random() * this.bounds.x,
+        Math.random() * this.bounds.y
+    );
+
     this.prepare();
-
   }
 
   shader()
@@ -40,27 +54,38 @@ export default class Boid
   mutate(stats)
   {
     // Calculate and sum correction vectors into 'accelerate' vector
-    this.flock(stats.neighbours);
+    this.flock( stats.neighbours );
+
+    // User seek / avoid
+    this.interact( stats );
 
     // Apply the movement
     this.move();
   }
 
+  interact(stats)
+  {
+    // Avoid the predator! (a mouse, ironically)
+    //this.accelerate.tadd( this.flee( stats.mouse ) );
 
+    // Seek the mouse!
+    //this.accelerate.tadd( this.seek( stats.mouse ) );
+  }
 
   move()
   {
-    this.velocity.tadd(this.accelerate);
+    this.velocity.tadd( this.accelerate );
     let m = this.velocity.mag();
 
     if (m > this.maxVelocity)
-      this.velocity.tdiv(m / this.maxVelocity);
+      this.velocity.tdiv( m / this.maxVelocity );
 
-    this.position.tadd(this.velocity);
-
-    this.accelerate.tmul(DECEL_RATE);
+    this.position.tadd( this.velocity );
 
     this.bound();
+
+    this.accelerate.tmul( DECEL_RATE );
+
     this.dirty = true;
   }
 
@@ -68,45 +93,96 @@ export default class Boid
   flock(neighbours)
   {
     this.accelerate = this.accelerate
-                      .add(this.falignment(neighbours))
-                      .add(this.fcohesion(neighbours))
-                      .add(this.fseparation(neighbours))
+                      .add(this.alignment( neighbours ))
+                      .add(this.cohesion( neighbours ))
+                      .add(this.separation( neighbours ))
+                      ;
   }
 
-  falignment(neighbours)
+  // Head towards
+  seek(target)
   {
-    let v = new Vector2();
-    let num = 0;
+    let d = this.position.dist( target );
 
-    for (let n of neighbours)
-      v.tadd( n.velocity );
+    if (d > SEEK_INTEREST_RANGE)
+      return new Vector2();
 
-    if (neighbours.length == 0)
-      return v;
-
-    v.tdiv( neighbours.length );
-
-    let force = v.mag();
-
-    if (force > this.maxSteer)
-      v.tdiv( force / this.maxSteer );
-
-    return v;
+    return target.sub( this.position ).norm().mul( 0.1 );
   }
 
-  fcohesion(neighbours)
+  // Steer away from, e.g. world boundary
+  avoid(target)
+  {
+    return this.position
+           .sub( target )
+           .mul( 1 / this.position.distsq( target ));
+  }
+
+  // Run!
+  flee(predator)
+  {
+    if (!predator) return new Vector2();
+
+    let d = this.position.dist( predator );
+
+    if (d > PREDATOR_DANGER)
+      return new Vector2();
+
+    let steer = this.position.sub( predator );
+
+    return steer.mul( 0.5 / d );
+  }
+
+  alignment(neighbours)
   {
     let c = new Vector2();
+
+    if (neighbours.length == 0)
+      return c;
+
     let num = 0;
 
     for (let n of neighbours)
     {
-        c.tadd( n.position );
-        num++;
+      if (Math.random() > FUZZY_NEIGHBOURS) continue;
+      c.tadd( n.velocity );
+      num++;
     }
 
-    if (num)
-      c.tdiv( num );
+    if (num == 0)
+      return c;
+
+    c.tdiv( num );
+
+    let force = c.mag();
+
+    if (force > this.maxSteer)
+      c.tdiv( force / this.maxSteer );
+
+    return c;
+  }
+
+  cohesion(neighbours)
+  {
+    let c = new Vector2();
+
+    if (neighbours.length == 0)
+      return c;
+
+    let num = 0;
+
+    for (let n of neighbours)
+    {
+      if (Math.random() > FUZZY_NEIGHBOURS) continue;
+
+      c.tadd( n.position );
+      num++;
+    }
+
+    if (num == 0)
+      return c;
+
+    c.tdiv( num );
 
     let steer = c.sub( this.position );
 
@@ -118,164 +194,33 @@ export default class Boid
     return steer;
   }
 
-  fseparation(neighbours)
+  separation(neighbours)
   {
     let c = new Vector2(); // summed correction vector
-    let r = new Vector2();
 
-    for (let t=0; t<neighbours.length; t++)
+    if (neighbours.length == 0)
+      return c;
+
+    for (let n of neighbours)
     {
-      let d = neighbours[t].position.dist(this.position);
+      if (Math.random() > FUZZY_NEIGHBOURS) continue;
 
-      if ( Math.random() < 0.6 )
-      {
-        r = this.position.sub(neighbours[t].position);
-        r.tnorm();
-        r.tdiv(d);
-        c.tadd(r);
-      }
+      let d = n.position.dist(this.position);
+      let r = this.position.sub(n.position);
+
+      r.tnorm();
+      r.tdiv(d);
+      c.tadd(r);
     }
 
     return c;
   }
 
-  mutateold(stats)
-  {
-    this.velocity = this.velocity
-                    //.add(this.separate(stats.neighbours, this.shyness))
-                    //.add(this.align(stats.neighbours))
-                    //.add(this.cohesion2(stats.neighbours))
-                    //.add( this.cohesion( stats.centroid ) )
-                    //.add(this.seek(stats.mouse))
-                  //  .norm();
-
-    //console.log( this.align( stats.neighbours ) );
-
-    this.position = this.position.add(this.velocity);
-
-    this.bound();
-    this.dirty = true;
-  }
-
-
-  rate(neighbours)
-  {
-    let av = new Vector2(0,0);
-
-    if (!neighbours.length) return av;
-
-    for (let t=0; t<neighbours.length; t++)
-        av = av.add(neighbours[t].velocity);
-
-    av = av.div(neighbours.length);
-
-    return av.sub(this.velocity).div(4);
-  }
-
-  seek(target)
+  seekold(target)
   {
     let desired = target.sub(this.position).norm();
     let steer = desired.sub(this.velocity).norm().mul(0.7)
     return steer;
-  }
-
-  align2(neighbours)
-  {
-    let distsq = 20 * 20;
-
-    let c = new Vector2(0,0);
-    let num = 0;
-
-    for (let t=0; t< neighbours.length; t++)
-    {
-      let d = neighbours[t].position.distsq(this.position);
-      if (d > 0 && d < distsq)
-      {
-        c = c.add(neighbours[t].velocity);
-        num++;
-      }
-    }
-
-    if (!num) return c;
-
-    return c.div(num).norm().mul(1.5).sub(this.velocity).norm();
-
-  }
-
-  cohesion2(neighbours)
-  {
-    let c = new Vector2(0,0)
-    if (neighbours.length == 0) return c;
-
-
-    for (let t=0; t<neighbours.length; t++)
-      if (t & 1) c = c.add(neighbours[t].position);
-
-    //console.log( neighbours.length );
-
-    //return this.cohesion( c.div( neighbours.length ) );
-    //return c.div(neighbours.length).norm().sub(this.position);
-    return this.seek(c.div(neighbours.length).mul(.8));
-
-  }
-
-  align(neighbours)
-  {
-    let c = new Vector2(0,0)
-    if (neighbours.length == 0) return c;
-
-
-    for (let t=0; t<neighbours.length; t++)
-      c = c.add(neighbours[t].velocity);
-
-    return c.div(neighbours.length).norm().mul(this.speed).sub(this.velocity);
-  }
-
-  separate(neighbours, spacing)
-  {
-    let spacingsq = spacing * spacing;
-
-    let c = new Vector2(0,0);
-    if (!neighbours.length) return c;
-
-    let num = 0;
-
-    for (let t=0; t<neighbours.length; t++)
-    {
-      let d = neighbours[t].position.distsq(this.position);
-
-      if (d < spacingsq)
-      {
-        let diff = this.position.sub(neighbours[t].position).norm();
-        c = c.add(diff.div(d));
-        num++;
-      }
-
-      if (!num) return c;
-
-      c = c.div(num).norm();
-
-      return c.sub(this.velocity).norm();
-
-    }
-    //
-    // for (let t=0; t<neighbours.length; t++)
-    // {
-    //     c = c.sub(
-    //               neighbours[t].position
-    //               .sub(this.position)
-    //               .norm()
-    //         );
-    // }
-    //
-    // return c.norm();
-  }
-
-  cohesion(target)
-  {
-    return target.sub(this.position)
-                 .sub(this.velocity)
-                 .norm();
   }
 
   bound()
@@ -284,13 +229,6 @@ export default class Boid
     this.position.y = this.wrap(this.position.y, this.bounds.y);
   }
 
-  // wrap(v, max)
-  // {
-  //   if ( v < 0 ) 0
-  //   if ( v > max-1) return max-1;
-  //   return v;
-  // }
-
   wrap(v, max)
   {
     if ( v < 0 ) return v + max;
@@ -298,12 +236,9 @@ export default class Boid
     return v;
   }
 
-
   // Called at the start of every frame
   prepare()
   {
-    this.dirty = false;
   }
-
 
 }
