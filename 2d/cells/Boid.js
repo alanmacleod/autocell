@@ -1,10 +1,5 @@
 
-
 import Vector2  from '../math/Vector2';
-
-const PALETTE = [
-  [0,0,128]
-];
 
 // How hard to put on the brakes; 0.0=hard, 0.99=soft
 const DECEL_RATE = 0;
@@ -16,7 +11,10 @@ const PREDATOR_DANGER = 50;
 const FUZZY_NEIGHBOURS = 0.6;
 
 // Attraction radius of e.g. mouse cursor
-const SEEK_INTEREST_RANGE = 50;
+const SEEK_INTEREST_RANGE = 75;
+
+// How much of flock to wrap, the rest are bounded
+const FLOCK_WRAP = 0.8;
 
 
 export default class Boid
@@ -24,6 +22,10 @@ export default class Boid
   constructor(position, bounds)
   {
     this.bounds = bounds;
+
+    // Random shade of grey
+    let c = (128 + Math.floor(Math.random()*127)).toString(16);
+    this.shade = `0x${c}${c}${c}`;
 
     this.maxVelocity = 2 + (Math.random());
     this.maxSteer = 0.1;
@@ -45,7 +47,7 @@ export default class Boid
 
   shader()
   {
-    return PALETTE[0];
+    return this.shade;
   }
 
   // For each boid we follow these steps
@@ -57,6 +59,9 @@ export default class Boid
     // User seek / avoid
     this.interact( stats );
 
+    // Random movements
+    this.fuzzy();
+
     // Apply the movement
     this.move();
   }
@@ -64,7 +69,7 @@ export default class Boid
   interact(stats)
   {
     // Avoid the predator! (a mouse, ironically)
-    //this.accelerate.tadd( this.flee( stats.mouse ) );
+    this.accelerate.tadd( this.flee( stats.mouse ) );
 
     // Seek the mouse!
     //this.accelerate.tadd( this.seek( stats.mouse ) );
@@ -72,8 +77,10 @@ export default class Boid
 
   move()
   {
-    // Move half of the boids away from the world edge, wrap the other half
-    if (Math.random() > 0.8)
+    // Move a portion of the boids away from the world edge, wrap the rest.
+    // This makes it look more natural as if stray birds are joining the flock
+    // whilst others are leaving and creates two or three big flocks.
+    if (Math.random() > FLOCK_WRAP)
       this.bound();
 
     this.velocity.tadd( this.accelerate );
@@ -98,12 +105,15 @@ export default class Boid
                       .add(this.alignment( neighbours ))
                       .add(this.cohesion( neighbours ))
                       .add(this.separation( neighbours ));
+    // if (isNaN(this.accelerate))
+    //   console.log(this.accelerate);
   }
 
   bound()
   {
     let buffer = 10;
 
+    // World edges
     let left = this.avoid( new Vector2( 0, this.position.y ) );
     let right = this.avoid( new Vector2( this.bounds.x, this.position.y ) );
     let top = this.avoid( new Vector2( this.position.x, 0 ) );
@@ -149,7 +159,16 @@ export default class Boid
 
     let steer = this.position.sub( predator );
 
-    return steer.mul( 0.5 / d );
+    return steer.mul( 0.4 / d );
+  }
+
+  fuzzy()
+  {
+    if (Math.random() < 0.001)
+      this.velocity.tmul(-0.5);
+
+    if (Math.random() < 0.001)
+      this.accelerate.tmul(this.maxVelocity);
   }
 
   // Head in the same direction

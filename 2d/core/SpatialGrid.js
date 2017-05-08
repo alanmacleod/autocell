@@ -6,20 +6,22 @@
 // Cheap *dynamic* spatial index (2D)
 // Splits an area into a simple grid, each cell keeps track of a list of objects
 // Generally performs better on modern hardware compared to reconstructing a quadtree etc
-// add() or move() objects. Performce nearest neighbour search with query()
+// add() or move() objects. Performs k nearest neighbour search with query()
 // Worst case performance O(n) if all objects bunched into one cell (T_T)
 
 export default class SpatialGrid
 {
   constructor(minx, miny, maxx, maxy, cells)
   {
-    this.grid = this.array2d(cells, cells);
+
+    this.grid = this.array2d(cells);
 
     this.width = (maxx - minx);
     this.height = (maxy - miny);
     this.numcells = cells;
     this.xcellsize = this.width  / cells;
     this.ycellsize = this.height / cells;
+    this.prop = null;
 
     this.maxRadius = (Math.sqrt(this.width * this.width + this.height * this.height));
 
@@ -27,11 +29,20 @@ export default class SpatialGrid
   }
 
   // Expects: `item` contains `x` and `y` properties
-  add(item)
+  add(item, prop=null)
   {
+    this.prop = prop;
+    let pos = item;
+
+    if (this.prop)
+      pos = item[this.prop];
+
+    if (!pos.x || !pos.y)
+      throw Error("`item` type needs properties `x` and `y`");
+
     // Which cell
-    let cellx = this.wrap((item.x - this.mod(item.x, this.xcellsize)) / this.xcellsize);
-    let celly = this.wrap((item.y - this.mod(item.y, this.ycellsize)) / this.ycellsize);
+    let cellx = this.wrap((pos.x - this.mod(pos.x, this.xcellsize)) / this.xcellsize);
+    let celly = this.wrap((pos.y - this.mod(pos.y, this.ycellsize)) / this.ycellsize);
 
     let cell = this.grid[celly][cellx] || [];
 
@@ -52,6 +63,8 @@ export default class SpatialGrid
     // We haven't left the cell, carry on
     if ((cellfx == celltx) && (cellfy == cellty)) return;
 
+    // 12:51pm - Cell is null? Wtf why?
+
     // Remove us from the last cell
     let cell = this.grid[cellfy][cellfx];
     cell.splice(cell.indexOf(item), 1);
@@ -63,20 +76,18 @@ export default class SpatialGrid
 
   mod(a,  b)
   {
-      let r = a % b;
-      return r < 0 ? r + b : r;
+    let r = a % b;
+    return r < 0 ? r + b : r;
   }
 
+  // (x, y) = Centre
+  // r = Radius
   query(x, y, r)
   {
     if (r > this.maxRadius) r = this.maxRadius;
 
     // Squared distance
     let rsq = r * r;
-
-    // Which cell are we in?
-    // let cellcentrex = (x - (this.mod(x, this.xcellsize))) / this.xcellsize;
-    // let cellcentrey = (y - (this.mod(y, this.ycellsize))) / this.ycellsize;
 
     // Use diagonal extent to find the cell range to search
     let cellminx = ((x - r) - (this.mod((x - r), this.xcellsize))) / this.xcellsize;
@@ -87,33 +98,33 @@ export default class SpatialGrid
   //  console.log(`Checking numcells ${cellmaxx - cellminx}, ${cellmaxy - cellminy}`);
 
     if (cellminx < 0) cellminx = 0;
-    if (cellmaxx >= this.xcellsize) cellmaxx = this.xcellsize-1;
+    if (cellmaxx >= this.numcells) cellmaxx = this.numcells-1;
 
     if (cellminy < 0) cellminy = 0;
-    if (cellmaxy >= this.ycellsize) cellmaxy = this.ycellsize - 1;
+    if (cellmaxy >= this.numcells) cellmaxy = this.numcells - 1;
 
     this.foundObjects = [];
-    //
-    // if ((cellmaxy - cellminy) >= this.numcells) cellmaxy = cellminy + this.numcells - 1;
-    // if ((cellmaxx - cellminx) >= this.numcells) cellmaxx = cellminx + this.numcells - 1;
 
     for (let cy=cellminy; cy<=cellmaxy; cy++)
     {
       for (let cx=cellminx; cx<=cellmaxx; cx++)
       {
-        // let wx = this.wrap(cx), wy = this.wrap(cy);
+        let cell = this.grid[cy][cx];
 
-        // if (once[wy][wx]) continue;
-        // once[wy][wx] = 1;
-
-        let cell = this.grid[cy][cx]
         if (!cell) continue;
 
         for (let t=0; t<cell.length; t++)
         {
             let item = cell[t];
-            let d = this.distsq(item.x, item.y, x, y);
-            if (d <= rsq) this.foundObjects.push(item);
+
+            // Handle xy position stored in a child property of item
+            let pos = item;
+            if (this.prop) pos = item[this.prop];
+
+            let d = this.distsq(pos.x, pos.y, x, y);
+
+            if (d <= rsq)
+              this.foundObjects.push(item);
         }
       }
     }
@@ -162,7 +173,9 @@ export default class SpatialGrid
         for (let t=0; t<cell.length; t++)
         {
             let item = cell[t];
-            let d = this.distsq(item.x, item.y, x, y);
+            let pos = item;
+            if (this.prop) pos = item[this.prop]
+            let d = this.distsq(pos.x, pos.y, x, y);
             if (d <= rsq) objs.push(item);
         }
       }
@@ -186,7 +199,14 @@ export default class SpatialGrid
     // return a;
   }
 
-  array2d(w, h, init=null)
+  array2d(size)
+  {
+    for (var d=[]; d.length < size; d.push([]));
+    return d;
+  }
+
+
+  __array2d(w, h, init=null)
   {
     let v = [];
     for (let y=0; y<h; y++)

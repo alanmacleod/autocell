@@ -1,6 +1,9 @@
 
 //import Renderer     from './Renderer2d';
-import Vector2  from '../math/Vector2.js';
+
+import Vector2      from '../math/Vector2';
+import SpatialGrid  from '../core/SpatialGrid'
+
 let PIXI = require('pixi.js');    // ffs update your module defs, PIXI
 
 const NEIGHBOUR_RADIUS = 75;
@@ -12,6 +15,7 @@ export default class OpenWorld
     this.size = options.size; // World size
     this.data = null;
     this.scale = options.scale || 1;
+    this.grid = new SpatialGrid(0, 0, this.size, this.size, 10);
 
     this.element = document.getElementById(options.render);
 
@@ -40,13 +44,15 @@ export default class OpenWorld
         if (Math.random() < spread)
         {
           let c = new CellType(new Vector2(x, y), new Vector2(this.size, this.size))
-          this.data.push(
-            c
-          );
+
+          this.data.push(c);
+
+          // Add to spatial index, optionally telling it where the xy data is
+          this.grid.add(c, 'position')
 
           var r = new PIXI.Graphics();
 
-          r.beginFill(0xffffff);
+          r.beginFill(c.shader());
           r.drawRect(0,0,this.scale, this.scale);
           r.endFill();
           r.x = c.position.x * this.scale;
@@ -104,7 +110,21 @@ export default class OpenWorld
     {
       statistics.neighbours = this.neighbourhood(t, NEIGHBOUR_RADIUS);
 
+      let x = this.data[t].position.x;
+      let y = this.data[t].position.y;
+
       this.data[t].mutate(statistics);
+
+      // if (isNaN(this.data[t].position.x) || isNaN(this.data[t].positiony.y))
+      // {
+      //   console.log(this.data[t]);
+      // }
+
+      // Update spatial index
+      this.grid.move(this.data[t], x, y,
+                     this.data[t].position.x,
+                     this.data[t].position.y
+                   );
 
       if (this.data[t].dirty)
       {
@@ -117,6 +137,12 @@ export default class OpenWorld
 
   // index = lookup for this.data[] (to skip self-test), r = radius in world units
   neighbourhood(index, r)
+  {
+    let item = this.data[index].position;
+    return this.grid.query(item.x, item.y, r);
+  }
+
+  neighbourhoodBruteForce(index, r)
   {
     let rs = r * r;
     let n = [];
