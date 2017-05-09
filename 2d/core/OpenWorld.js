@@ -6,7 +6,7 @@ import SpatialGrid  from '../core/SpatialGrid'
 
 let PIXI = require('pixi.js');    // ffs update your module defs, PIXI
 
-const NEIGHBOUR_RADIUS = 75;
+const NEIGHBOUR_RADIUS = 50;
 
 export default class OpenWorld
 {
@@ -15,7 +15,7 @@ export default class OpenWorld
     this.size = options.size; // World size
     this.data = null;
     this.scale = options.scale || 1;
-    this.grid = new SpatialGrid(0, 0, this.size, this.size, 10);
+    this.grid = new SpatialGrid(0, 0, this.size, this.size, 10, false, 'position');
 
     this.element = document.getElementById(options.render);
 
@@ -43,12 +43,12 @@ export default class OpenWorld
       {
         if (Math.random() < spread)
         {
-          let c = new CellType(new Vector2(x, y), new Vector2(this.size, this.size))
+          let c = new CellType(new Vector2(x, y), new Vector2(this.size-1, this.size-1));
 
           this.data.push(c);
 
-          // Add to spatial index, optionally telling it where the xy data is
-          this.grid.add(c, 'position')
+          // Add to spatial index
+          this.grid.add(c)
 
           var r = new PIXI.Graphics();
 
@@ -71,15 +71,8 @@ export default class OpenWorld
 
   render()
   {
-    // for (let l=this.data.length, i=0; i<l; i++)
-    // {
-    //   let e = this.data[i];
-    //   let c = e.shader();
-    //
-    // }
     this.renderer.render(this.stage);
   }
-
 
 
   wrap(v)
@@ -108,7 +101,26 @@ export default class OpenWorld
 
     for (let t=0,l=this.data.length; t<l;t++)
     {
-      statistics.neighbours = this.neighbourhood(t, NEIGHBOUR_RADIUS);
+      statistics.neighbours = this.grid.query(this.data[t], NEIGHBOUR_RADIUS);
+
+      // if (statistics.neighbours.length > 0)
+      // {
+      //   let me = this.data[t];
+      //   let ns = "neighbours: ";
+      //   let foundDupes = false;
+      //
+      //   for (let n of statistics.neighbours)
+      //   {
+      //     ns += n.id+", ";
+      //     if (n.id == me.id) foundDupes = true;
+      //   }
+      //
+      //   if (foundDupes) console.log("FOUND DUPES");
+      //   console.log(`me.id=${me.id}, neigh.id=${ns}`);
+      //
+      // }
+
+
 
       let x = this.data[t].position.x;
       let y = this.data[t].position.y;
@@ -133,13 +145,6 @@ export default class OpenWorld
       }
     }
 
-  }
-
-  // index = lookup for this.data[] (to skip self-test), r = radius in world units
-  neighbourhood(index, r)
-  {
-    let item = this.data[index].position;
-    return this.grid.query(item.x, item.y, r);
   }
 
   neighbourhoodBruteForce(index, r)

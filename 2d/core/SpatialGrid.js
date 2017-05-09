@@ -1,4 +1,5 @@
 
+import log from  'loglevel';
 //
 // Alan MacLeod 04-May-2017
 //
@@ -11,9 +12,8 @@
 
 export default class SpatialGrid
 {
-  constructor(minx, miny, maxx, maxy, cells)
+  constructor(minx, miny, maxx, maxy, cells, boundsChecking=false, prop=null)
   {
-
     this.grid = this.array2d(cells);
 
     this.width = (maxx - minx);
@@ -21,17 +21,25 @@ export default class SpatialGrid
     this.numcells = cells;
     this.xcellsize = this.width  / cells;
     this.ycellsize = this.height / cells;
-    this.prop = null;
+    this.prop = prop;
+
+    this.bounds = {
+      minx: minx,
+      miny: miny,
+      maxx: maxx,
+      maxy: maxy
+    };
 
     this.maxRadius = (Math.sqrt(this.width * this.width + this.height * this.height));
+
+    this.boundsChecking = boundsChecking;
 
     this.foundObjects = [];
   }
 
   // Expects: `item` contains `x` and `y` properties
-  add(item, prop=null)
+  add(item)
   {
-    this.prop = prop;
     let pos = item;
 
     if (this.prop)
@@ -63,15 +71,44 @@ export default class SpatialGrid
     // We haven't left the cell, carry on
     if ((cellfx == celltx) && (cellfy == cellty)) return;
 
+    if (this.boundsChecking)
+    {
+      this.checkBounds(fx, fy);
+      this.checkBounds(tx, ty);
+    }
+
     // 12:51pm - Cell is null? Wtf why?
 
     // Remove us from the last cell
-    let cell = this.grid[cellfy][cellfx];
+    let cell;
+    cell = this.grid[cellfy][cellfx];
+
+    // try {
+    //   cell = this.grid[cellfy][cellfx];
+    // } catch (error) {
+    //   throw Error(`Invalid cell at ${cellfy}, ${cellfx} ${fx} ${fy} ${tx} ${ty}`);
+    // }
+    // if (!cell)
+    // {
+    //   throw Error(`Invalid cell at ${cellfy}, ${cellfx}`);
+    // }
     cell.splice(cell.indexOf(item), 1);
 
     // Add us to the new cell
     cell = this.grid[this.wrap(cellty)][this.wrap(celltx)];
     cell.push(item);
+  }
+
+  checkBounds(x, y)
+  {
+    if (isNaN(x) || isNaN(y))
+      throw Error(`Invalid coordinate pair ${x},${y}`);
+
+    if (x < this.bounds.minx || x > this.bounds.maxx)
+      throw Error(`${x} out of bounds [${this.bounds.minx}, ${this.bounds.maxx}]`);
+
+    if (y < this.bounds.miny || y > this.bounds.maxy)
+      throw Error(`${y} out of bounds [${this.bounds.miny},${this.bounds.maxy}]`);
   }
 
   mod(a,  b)
@@ -82,18 +119,22 @@ export default class SpatialGrid
 
   // (x, y) = Centre
   // r = Radius
-  query(x, y, r)
+  query(item, r)
   {
     if (r > this.maxRadius) r = this.maxRadius;
+
+    let pos = item;
+    if (this.prop)
+      pos = item[this.prop];
 
     // Squared distance
     let rsq = r * r;
 
     // Use diagonal extent to find the cell range to search
-    let cellminx = ((x - r) - (this.mod((x - r), this.xcellsize))) / this.xcellsize;
-    let cellminy = ((y - r) - (this.mod((y - r), this.ycellsize))) / this.ycellsize;
-    let cellmaxx = ((x + r) - (this.mod((x + r), this.xcellsize))) / this.xcellsize;
-    let cellmaxy = ((y + r) - (this.mod((y + r), this.ycellsize))) / this.ycellsize;
+    let cellminx = ((pos.x - r) - (this.mod((pos.x - r), this.xcellsize))) / this.xcellsize;
+    let cellminy = ((pos.y - r) - (this.mod((pos.y - r), this.ycellsize))) / this.ycellsize;
+    let cellmaxx = ((pos.x + r) - (this.mod((pos.x + r), this.xcellsize))) / this.xcellsize;
+    let cellmaxy = ((pos.y + r) - (this.mod((pos.y + r), this.ycellsize))) / this.ycellsize;
 
   //  console.log(`Checking numcells ${cellmaxx - cellminx}, ${cellmaxy - cellminy}`);
 
@@ -103,7 +144,7 @@ export default class SpatialGrid
     if (cellminy < 0) cellminy = 0;
     if (cellmaxy >= this.numcells) cellmaxy = this.numcells - 1;
 
-    this.foundObjects = [];
+    let objs = [];
 
     for (let cy=cellminy; cy<=cellmaxy; cy++)
     {
@@ -115,21 +156,24 @@ export default class SpatialGrid
 
         for (let t=0; t<cell.length; t++)
         {
-            let item = cell[t];
+            let neighbour = cell[t];
+
+            if (neighbour == item)
+              continue;
 
             // Handle xy position stored in a child property of item
-            let pos = item;
-            if (this.prop) pos = item[this.prop];
+            let npos = neighbour;
+            if (this.prop) npos = neighbour[this.prop];
 
-            let d = this.distsq(pos.x, pos.y, x, y);
+            let d = this.distsq(npos.x, npos.y, pos.x, pos.y);
 
             if (d <= rsq)
-              this.foundObjects.push(item);
+              objs.push(neighbour);
         }
       }
     }
 
-    return this.foundObjects;
+    return objs;
   }
 
 
@@ -201,8 +245,18 @@ export default class SpatialGrid
 
   array2d(size)
   {
-    for (var d=[]; d.length < size; d.push([]));
-    return d;
+    //for (var d=[]; d.length < size; d.push([]));
+    //return d;
+    let g = [];
+    for (let y=0; y<size; y++)
+    {
+      g.push([]);
+      for (let x=0; x<size; x++)
+      {
+        g[y][x] = [];
+      }
+    }
+    return g;
   }
 
 

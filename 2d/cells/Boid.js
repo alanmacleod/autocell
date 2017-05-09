@@ -16,7 +16,6 @@ const SEEK_INTEREST_RANGE = 75;
 // How much of flock to wrap, the rest are bounded
 const FLOCK_WRAP = 0.8;
 
-
 export default class Boid
 {
   constructor(position, bounds)
@@ -43,6 +42,8 @@ export default class Boid
     );
 
     this.prepare();
+
+    this.DEBUG_STOP_DOING_STUFF = false;
   }
 
   shader()
@@ -53,26 +54,44 @@ export default class Boid
   // For each boid we follow these steps
   mutate(stats)
   {
+
+    if (this.DEBUG_STOP_DOING_STUFF) return;
+
     // Calculate and sum correction vectors into 'accelerate' vector
     this.flock( stats.neighbours );
 
     // User seek / avoid
     this.interact( stats );
 
-    // Random movements
+    //Random movements
     this.fuzzy();
 
     // Apply the movement
     this.move();
   }
 
+
+  flock(neighbours)
+  {
+    this.accelerate = this.accelerate
+                      .add(this.alignment( neighbours ))
+                      .add(this.cohesion( neighbours ))
+                      .add(this.separation( neighbours ));
+  }
+
   interact(stats)
   {
     // Avoid the predator! (a mouse, ironically)
-    this.accelerate.tadd( this.flee( stats.mouse ) );
+    //this.accelerate.tadd( this.flee( stats.mouse ) );
 
     // Seek the mouse!
     //this.accelerate.tadd( this.seek( stats.mouse ) );
+  }
+
+  fuzzy()
+  {
+    if (Math.random() < 0.001)
+      this.accelerate.tmul(this.maxVelocity);
   }
 
   move()
@@ -98,16 +117,6 @@ export default class Boid
     this.dirty = true;
   }
 
-
-  flock(neighbours)
-  {
-    this.accelerate = this.accelerate
-                      .add(this.alignment( neighbours ))
-                      .add(this.cohesion( neighbours ))
-                      .add(this.separation( neighbours ));
-    // if (isNaN(this.accelerate))
-    //   console.log(this.accelerate);
-  }
 
   bound()
   {
@@ -162,14 +171,6 @@ export default class Boid
     return steer.mul( 0.4 / d );
   }
 
-  fuzzy()
-  {
-    if (Math.random() < 0.001)
-      this.velocity.tmul(-0.5);
-
-    if (Math.random() < 0.001)
-      this.accelerate.tmul(this.maxVelocity);
-  }
 
   // Head in the same direction
   alignment(neighbours)
@@ -247,6 +248,12 @@ export default class Boid
       if (Math.random() > FUZZY_NEIGHBOURS) continue;
 
       let d = n.position.dist(this.position);
+
+      // On the off-chance we have two boids at the exact coordinates (shouldn't be possible)
+      // dodge the divbyzero just in case!
+      if (d == 0)
+        continue;
+
       let r = this.position.sub(n.position);
 
       r.tnorm();
@@ -266,7 +273,7 @@ export default class Boid
   wrap(v, max)
   {
     if ( v < 0 ) return v + max;
-    if ( v > max-1) return v - max;
+    if ( v > max) return v - max;
     return v;
   }
 
