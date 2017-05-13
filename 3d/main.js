@@ -1,24 +1,19 @@
 
-import GameOfLife3d     from './cells/GoL-3d.js';
-import World3d          from './core/World-3d.js'
+import OpenWorld3d          from './core/OpenWorld-3d';
+import Boid3d               from './cells/Boid-3d';
 
-const SIZE = 30; // cells^3
-const VIEW_SCALE = 50;
-const WORLD_FRAME_RATE = 20;
+const SIZE = 1000;
+const VIEW_SCALE = 10;
+const WORLD_FRAME_RATE = 45;
 
-let world = new World3d({
-  size: SIZE,
-  spread: 1.0,
+let world = new OpenWorld3d({
+  size: SIZE,         // World bounds
+  spread: 100,        // Number of entities
   render: 'content',
-  type: GameOfLife3d,
+  type: Boid3d,
   scale: VIEW_SCALE
 });
 
-//world.render();
-
-//world.evolve();
-// world.render();
-//
 window.requestAnimationFrame(render);
 window.setInterval(() => { world.evolve() }, 1000 / WORLD_FRAME_RATE);
 
