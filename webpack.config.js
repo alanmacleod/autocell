@@ -6,7 +6,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 if (process.env.NODE_ENV == 'production')
   console.log("*** Building for PRODUCTION ****");
 else
-  console.log("*** Building for development ****");
+  console.log("*** Building for development **** ("+process.env.NODE_ENV+")");
 
 module.exports = [
     {
