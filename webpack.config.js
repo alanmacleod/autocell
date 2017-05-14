@@ -1,7 +1,6 @@
 
 var path = require('path');
-
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const BabiliPlugin = require("babili-webpack-plugin");
 
 if (process.env.NODE_ENV == 'production')
   console.log("*** Building for PRODUCTION ****");
@@ -36,8 +35,7 @@ module.exports = [
         },
         plugins: process.env.NODE_ENV != 'production' ? [] :
         [
-          // new webpack.optimize.UglifyJsPlugin({minimize: true})
-          new UglifyJSPlugin()
+          new BabiliPlugin({removeConsole:true}, {comments: false, sourceMap: false})
         ]
     },
     {
@@ -67,8 +65,7 @@ module.exports = [
         },
         plugins: process.env.NODE_ENV != 'production' ? [] :
                 [
-                  //new webpack.optimize.UglifyJsPlugin({minimize: true})
-                  new UglifyJSPlugin()
+                  new BabiliPlugin({removeConsole:true}, {comments: false, sourceMap: false})
                 ]
     },
     {
@@ -98,8 +95,7 @@ module.exports = [
         },
         plugins: process.env.NODE_ENV != 'production' ? [] :
         [
-          //new webpack.optimize.UglifyJsPlugin({minimize: true})
-          new UglifyJSPlugin()
+          new BabiliPlugin({removeConsole:true}, {comments: false, sourceMap: false})
         ]
     }
 ];
