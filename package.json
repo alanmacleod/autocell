@@ -4,7 +4,8 @@
   "description": "Exploration of cellular automata",
   "main": "bundle.js",
   "scripts": {
-    "test": "ava"
+    "test": "ava",
+    "build": "webpack -c"
   },
   "dependencies": {
     "babel-core": "^6.18.2",
