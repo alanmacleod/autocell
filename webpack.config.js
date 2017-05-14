@@ -1,7 +1,7 @@
 
 var path = require('path');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 if (process.env.NODE_ENV == 'production')
   console.log("*** Building for PRODUCTION ****");
@@ -35,9 +35,10 @@ module.exports = [
             extensions: ['', '.js', '.json']
         },
         plugins: process.env.NODE_ENV != 'production' ? [] :
-                [
-                  new UglifyJSPlugin()
-                ]
+        [
+          // new webpack.optimize.UglifyJsPlugin({minimize: true})
+          new UglifyJSPlugin()
+        ]
     },
     {
         context: path.join(__dirname, "2d"),
@@ -66,6 +67,7 @@ module.exports = [
         },
         plugins: process.env.NODE_ENV != 'production' ? [] :
                 [
+                  //new webpack.optimize.UglifyJsPlugin({minimize: true})
                   new UglifyJSPlugin()
                 ]
     },
@@ -95,8 +97,9 @@ module.exports = [
             extensions: ['', '.js', '.json']
         },
         plugins: process.env.NODE_ENV != 'production' ? [] :
-                [
-                  new UglifyJSPlugin()
-                ]
+        [
+          //new webpack.optimize.UglifyJsPlugin({minimize: true})
+          new UglifyJSPlugin()
+        ]
     }
 ];
