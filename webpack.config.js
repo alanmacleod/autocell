@@ -3,7 +3,8 @@ var path = require('path');
 
 module.exports = [
     {
-        entry: './1d/main.js',
+        context: path.join(__dirname, "1d"),
+        entry: './main.js',
         devtool: "inline-sourcemap",
         output: {
           path: path.join(__dirname, "/public_html/1d/build"),
