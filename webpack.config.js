@@ -1,8 +1,6 @@
 
 var path = require('path');
 
-// test
-
 module.exports = [
     {
         context: path.join(__dirname, "1d"),
