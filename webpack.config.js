@@ -29,7 +29,8 @@ module.exports = [
         }
     },
     {
-        entry: './2d/main.js',
+        context: path.join(__dirname, "2d"),
+        entry: './main.js',
         devtool: "inline-sourcemap",
         output: {
           path: path.join(__dirname, "/public_html/2d/build"),
@@ -54,7 +55,8 @@ module.exports = [
         }
     },
     {
-        entry: './3d/main.js',
+        context: path.join(__dirname, "3d"),
+        entry: './main.js',
         devtool: "inline-sourcemap",
         output: {
           path: path.join(__dirname, "/public_html/3d/build"),
