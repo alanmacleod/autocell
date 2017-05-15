@@ -5,7 +5,7 @@ const BabiliPlugin = require("babili-webpack-plugin");
 if (process.env.NODE_ENV == 'production')
   console.log("*** Building for PRODUCTION ****");
 else
-  console.log("*** Building for development **** ("+process.env.NODE_ENV+")");
+  console.log("*** Building for development ****");
 
 module.exports = [
     {

@@ -56,10 +56,11 @@ export default class GeomRenderer3d
     this.camera.lookAt( new THREE.Vector3(0,2500, 0) );
 
     this.scene = new THREE.Scene();
+    this.sceneBox = new THREE.Scene();
 
     // Add hard spotlight and position where sun is?
-    //this.ambientLight = new THREE.AmbientLight(0x707070);
-    // this.scene.add(this.ambientLight);
+    this.ambientLight = new THREE.AmbientLight(0xE0E0E0);
+    this.sceneBox.add(this.ambientLight);
 
     // var light = new THREE.PointLight( 0xff0000, 100, 0, 4 );
     // light.position.set( 0, 2490, 0 );
@@ -69,14 +70,16 @@ export default class GeomRenderer3d
     this.directionalLight.position.set(1, 1, -0.5 ).normalize();
     this.scene.add(this.directionalLight);
 
-    this.scene.fog = new THREE.FogExp2( 0xffffff, 0.0004 );
+
+    //this.scene.fog = new THREE.FogExp2( 0xffffff, 0.0007 );
 
     // Set up renderer basics
     this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setClearColor(0xf0f0f0);
+    //this.renderer.setClearColor(0xf0f0f0);
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.width, this.height);
     this.renderElement.appendChild(this.renderer.domElement);
+    this.renderer.autoClear = false;
 
     // Use mouse to, sort of, 'pivot' around a point
     this.controls = new THREE.OrbitControls(this.camera);
@@ -176,7 +179,7 @@ export default class GeomRenderer3d
       this.skyBox.applyMatrix(new THREE.Matrix4().makeScale(1,1,-1));
 
       // All done, add our sky to the scene
-      this.scene.add(this.skyBox);
+      this.sceneBox.add(this.skyBox);
     }
 
   }
@@ -211,6 +214,7 @@ export default class GeomRenderer3d
       let mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
         // Make a few of them light coloured
         color: Math.random() < 0.9 ? 0x303030 : 0xD0D0D0,
+
         // Double sided, obviously
         side: THREE.DoubleSide
       }));
@@ -349,7 +353,10 @@ export default class GeomRenderer3d
 
     }
 
+    this.renderer.render(this.sceneBox, this.camera);
     this.renderer.render(this.scene, this.camera);
+
+
   }
 
 }
