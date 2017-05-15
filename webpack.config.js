@@ -19,7 +19,7 @@ module.exports = [
         entry: './main.js',
         devtool: "inline-sourcemap",
         output: {
-          path: path.join(__dirname, "/public_html/1d/build"),
+          path: path.join(__dirname, "/pub/1d/build"),
           publicPath: "/",
           filename: "1d.js"
         },
@@ -49,7 +49,7 @@ module.exports = [
         entry: './main.js',
         devtool: "inline-sourcemap",
         output: {
-          path: path.join(__dirname, "/public_html/2d/build"),
+          path: path.join(__dirname, "/pub/2d/build"),
           publicPath: "/",
           filename: "2d.js"
         },
@@ -79,7 +79,7 @@ module.exports = [
         entry: './main.js',
         devtool: "inline-sourcemap",
         output: {
-          path: path.join(__dirname, "/public_html/3d/build"),
+          path: path.join(__dirname, "/pub/3d/build"),
           publicPath: "/",
           filename: "3d.js"
         },
