@@ -103,34 +103,10 @@ export default class OpenWorld
     {
       statistics.neighbours = this.grid.query(this.data[t], NEIGHBOUR_RADIUS);
 
-      // if (statistics.neighbours.length > 0)
-      // {
-      //   let me = this.data[t];
-      //   let ns = "neighbours: ";
-      //   let foundDupes = false;
-      //
-      //   for (let n of statistics.neighbours)
-      //   {
-      //     ns += n.id+", ";
-      //     if (n.id == me.id) foundDupes = true;
-      //   }
-      //
-      //   if (foundDupes) console.log("FOUND DUPES");
-      //   console.log(`me.id=${me.id}, neigh.id=${ns}`);
-      //
-      // }
-
-
-
       let x = this.data[t].position.x;
       let y = this.data[t].position.y;
 
       this.data[t].mutate(statistics);
-
-      // if (isNaN(this.data[t].position.x) || isNaN(this.data[t].positiony.y))
-      // {
-      //   console.log(this.data[t]);
-      // }
 
       // Update spatial index
       this.grid.move(this.data[t], x, y,

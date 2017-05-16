@@ -1,7 +1,7 @@
 
 // Interesting rules: 30, 45, 90, 110
 
-import Canvas2d     from '../shared/Canvas2d';
+import Canvas2d     from '../2d/core/Canvas2d';
 import Generation   from './Generation';
 import Rule         from './Rule';
 import Renderer1d   from './Renderer1d';

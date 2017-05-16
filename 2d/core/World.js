@@ -34,7 +34,6 @@ export default class World
         if (CellType.test)
         {
           // Is it ok if we place the cell here?
-          //if ()
           if (Math.random() <= spread)
             this.data[y][x] = new CellType(
               CellType.test(x,y,this.size, this.size)
@@ -96,7 +95,8 @@ export default class World
     return d;
   }
 
-  // makes very little difference :/
+  // Different processing direction/order, makes no difference
+  // And as I realised after I wrote, it shouldn't!
   swirl()
   {
     let next = this.array2d(this.size);
@@ -111,7 +111,6 @@ export default class World
     {
       for (let xi=0; xi < iterator; xi++)
       {
-        //can.block(x * VIEW_SCALE, y*VIEW_SCALE, VIEW_SCALE, VIEW_SCALE, col);
         if (this.data[y][x])
           next[y][x] = this.data[y][x].mutate(this.neighbourhood(x,y));
 
@@ -123,8 +122,6 @@ export default class World
 
       for (let yi=0; yi < iterator; yi++)
       {
-
-        //can.block(x * VIEW_SCALE, y*VIEW_SCALE, VIEW_SCALE, VIEW_SCALE, col);
         if (this.data[y][x])
           next[y][x] = this.data[y][x].mutate(this.neighbourhood(x,y));
 
@@ -154,7 +151,6 @@ export default class World
           next[y][x] = this.data[y][x].mutate(this.neighbourhood(x,y));
       }
     }
-
     this.data = next;
   }
 

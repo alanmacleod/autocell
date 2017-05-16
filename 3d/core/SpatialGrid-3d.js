@@ -22,7 +22,7 @@ export default class SpatialGrid3d
   {
     this.grid = this.array3d(cells);
 
-    this.bounds = bounds;
+    this.bounds = this.verifybounds(bounds);
 
     this.width = (this.bounds.maxx - this.bounds.minx) + 1;
     this.height = (this.bounds.maxy - this.bounds.miny) + 1;
@@ -41,7 +41,16 @@ export default class SpatialGrid3d
 
     this.foundObjects = [];
 
-    console.log(`[Init SpatialGrid()] Bounds: (${this.bounds.minx}, ${this.bounds.miny}, ${this.bounds.minz}) -> (${this.bounds.maxx}, ${this.bounds.maxy}, ${this.bounds.maxz})`);
+    //console.log(`[Init SpatialGrid()] Bounds: (${this.bounds.minx}, ${this.bounds.miny}, ${this.bounds.minz}) -> (${this.bounds.maxx}, ${this.bounds.maxy}, ${this.bounds.maxz})`);
+  }
+
+  verifybounds(b)
+  {
+    if (isNaN(b.minx) || isNaN(b.maxx) || isNaN(b.miny) ||
+        isNaN(b.maxy) || isNaN(b.minz) || isNaN(b.maxz))
+      throw Error("Invalid bounds, need minx -> maxz");
+
+    return b;
   }
 
   // Expects: `item` contains `x` and `y` properties
@@ -52,8 +61,8 @@ export default class SpatialGrid3d
     if (this.prop)
       pos = item[this.prop];
 
-    if (!pos.x || !pos.y)
-      throw Error("`item` type needs properties `x` and `y`");
+    if (!pos.x || !pos.y || !pos.z)
+      throw Error("`item` type needs properties `x`, `y` and `z`");
 
     // Which cell
     let cellx = this.wrap((pos.x - this.mod(pos.x, this.xcellsize)) / this.xcellsize);

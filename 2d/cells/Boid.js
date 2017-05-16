@@ -42,8 +42,6 @@ export default class Boid
     );
 
     this.prepare();
-
-    this.DEBUG_STOP_DOING_STUFF = false;
   }
 
   shader()
@@ -54,9 +52,6 @@ export default class Boid
   // For each boid we follow these steps
   mutate(stats)
   {
-
-    if (this.DEBUG_STOP_DOING_STUFF) return;
-
     // Calculate and sum correction vectors into 'accelerate' vector
     this.flock( stats.neighbours );
 

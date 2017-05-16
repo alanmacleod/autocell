@@ -1,14 +1,19 @@
 
+// Some other test cells
+// import Flood        from './cells/Flood';
+// import Burrow       from './cells/Burrow';
+// import Blur         from './cells/Blur';
+// import Snow         from './cells/Snow';
 
-import SpatialGrid  from './core/SpatialGrid';
+// Uncomment these and change to `let world = new OpenWorld({})`
+// and set `type: Boid` to see original 2D boids demo
+// Also set SIZE = 400 and VIEW_SCALE=1
+
+// import Boid         from './cells/Boid'
+// import OpenWorld    from './core/OpenWorld';
+
 import World        from './core/World.js';
 import GameOfLife   from './cells/GoL';
-import Flood        from './cells/Flood';
-import Burrow       from './cells/Burrow';
-import Blur         from './cells/Blur';
-import Snow         from './cells/Snow';
-import Boid         from './cells/Boid'
-import OpenWorld    from './core/OpenWorld';
 
 const SIZE = 100; // cells
 const VIEW_SCALE = 8;

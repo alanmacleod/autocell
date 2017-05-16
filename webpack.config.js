@@ -1,11 +1,11 @@
 
-var path = require('path');
+const path = require('path');
 const BabiliPlugin = require("babili-webpack-plugin");
 
 // Workaround for remote server build & deploy problems
 // npm skips installing devDependencies{} if NODE_ENV=="production"
 // But webpack needs those deps to build! Sure there's a nicer way but #fornow:
-const PRODUCTION_STR = "buildproduction"
+const PRODUCTION_STR = "buildproduction";
 
 
 if (process.env.NODE_ENV == PRODUCTION_STR)
@@ -36,7 +36,6 @@ module.exports = [
             ]
         },
         resolve: {
-            // you can now require('file') instead of require('file.coffee')
             extensions: ['', '.js', '.json']
         },
         plugins: process.env.NODE_ENV != PRODUCTION_STR ? [] :
@@ -66,13 +65,13 @@ module.exports = [
             ]
         },
         resolve: {
-            // you can now require('file') instead of require('file.coffee')
+
             extensions: ['', '.js', '.json']
         },
         plugins: process.env.NODE_ENV != PRODUCTION_STR ? [] :
-                [
-                  new BabiliPlugin({removeConsole:true}, {comments: false, sourceMap: false})
-                ]
+          [
+            new BabiliPlugin({removeConsole:true}, {comments: false, sourceMap: false})
+          ]
     },
     {
         context: path.join(__dirname, "3d"),
@@ -96,7 +95,6 @@ module.exports = [
             ]
         },
         resolve: {
-            // you can now require('file') instead of require('file.coffee')
             extensions: ['', '.js', '.json']
         },
         plugins: process.env.NODE_ENV != PRODUCTION_STR ? [] :

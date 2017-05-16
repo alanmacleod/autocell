@@ -18,6 +18,8 @@ const FLOCK_WRAP = 0.5;
 
 const MAX_VELOCITY = 6;
 
+// Optimisation note: could eliminate (re)calculation of square roots
+
 export default class Boid
 {
   constructor(position, bounds)

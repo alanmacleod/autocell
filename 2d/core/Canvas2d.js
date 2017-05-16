@@ -7,11 +7,11 @@ export default class Canvas2d
   constructor(parent)
   {
     this.parent = typeof parent == 'string' ? document.getElementById(parent) : parent;
+
     this.element = document.createElement("canvas");
     this.parent.appendChild(this.element);
     this.context = this.element.getContext("2d");
     this.clear();
-
   }
 
   block(x,y,w,h,c)
@@ -54,10 +54,7 @@ export default class Canvas2d
 
   resize(w, h)
   {
-
     this.element.width = w;
     this.element.height = h;
-
-    // draw()
   }
 }

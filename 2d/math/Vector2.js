@@ -43,24 +43,28 @@ export default class Vector2
   {
     this.x -= b.x;
     this.y -= b.y;
+    return this;
   }
 
   tadd(b)
   {
     this.x += b.x;
     this.y += b.y;
+    return this;
   }
 
   tmul(s)
   {
     this.x *= s;
     this.y *= s;
+    return this;
   }
 
   tdiv(s)
   {
     this.x /= s;
     this.y /= s;
+    return this;
   }
 
   tnorm()

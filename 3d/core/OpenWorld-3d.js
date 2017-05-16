@@ -1,12 +1,8 @@
 
-//import Renderer     from './Renderer2d';
-
 import Vector2            from '../../2d/math/Vector2';
 import Vector3            from '../math/Vector3';
 import GeomRenderer3d    from '../core/GeomRenderer-3d'
 import SpatialGrid3d      from '../core/SpatialGrid-3d'
-
-//import SpatialGrid  from '../core/SpatialGrid'
 
 const NEIGHBOUR_RADIUS = 250;
 

@@ -35,7 +35,7 @@ export default class Vector3
 
   div(s)
   {
-    return new Vector2(this.x / s, this.y / s, this.z / s);
+    return new Vector3(this.x / s, this.y / s, this.z / s);
   }
 
   // Arithmetic in-place
@@ -45,6 +45,7 @@ export default class Vector3
     this.x -= b.x;
     this.y -= b.y;
     this.z -= b.z;
+    return this;
   }
 
   tadd(b)
@@ -52,6 +53,7 @@ export default class Vector3
     this.x += b.x;
     this.y += b.y;
     this.z += b.z;
+    return this;
   }
 
   tmul(s)
@@ -59,6 +61,7 @@ export default class Vector3
     this.x *= s;
     this.y *= s;
     this.z *= s;
+    return this;
   }
 
   tdiv(s)
@@ -66,6 +69,7 @@ export default class Vector3
     this.x /= s;
     this.y /= s;
     this.z /= s;
+    return this;
   }
 
   tnorm()
