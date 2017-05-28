@@ -6,11 +6,11 @@ Exploration of cellular automata in 1d, 2d and 3d
 
 ### Live demo
 
-[3D birds](https://demos.alanmacleod.eu/autocell/pub/3d/)
+[3D birds](http://demos.alanmacleod.eu/autocell/pub/3d/)
 
-[2D Game Of Life](https://demos.alanmacleod.eu/autocell/pub/2d/)
+[2D Game Of Life](http://demos.alanmacleod.eu/autocell/pub/2d/)
 
-[1D Iterations (interactive)](https://demos.alanmacleod.eu/autocell/pub/1d/)
+[1D Iterations (interactive)](http://demos.alanmacleod.eu/autocell/pub/1d/)
 
 ### Installation
 
